@@ -3,6 +3,7 @@ module git.iwanhae.kr/wan/jupynetes
 go 1.15
 
 require (
+	github.com/go-chi/chi v1.5.1
 	github.com/go-logr/logr v0.3.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.5.3 // indirect
