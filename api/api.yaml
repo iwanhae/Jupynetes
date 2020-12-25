@@ -1,0 +1,495 @@
+openapi: "3.0.2"
+info:
+  title: jupynetes-api
+  version: "0.1/alpha"
+servers:
+  - url: "{protocol}://{url}:{port}/v1"
+    variables:
+      protocol:
+        enum:
+          - "http"
+          - "https"
+        default: http
+        description: your server protocol. https for production recommended
+      url:
+        default: 127.0.0.1
+        description: your server address
+      port:
+        default: "3000"
+        description: api server port. 3000 for dev.
+paths:
+  /admin/user:
+    get:
+      security:
+        - jwtAuth: []
+      summary: get user list
+      operationId: AdminGetUserList
+      tags:
+        - admin
+        - user
+      responses:
+        "200":
+          description: get user list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserInfo"
+        "400":
+          description: YOU ARE NOT ADMIN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+  /admin/template:
+    post:
+      security:
+        - jwtAuth: []
+      summary: create template
+      operationId: CreateTemplate
+      tags:
+        - admin
+        - template
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Template"
+      responses:
+        "200":
+          description: template created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Template"
+        "400":
+          description: YOU ARE NOT ADMIN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+  /admin/quota:
+    post:
+      security:
+        - jwtAuth: []
+      summary: set group quota
+      operationId: SetGroupQuota
+      tags:
+        - admin
+        - quota
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Quota"
+      responses:
+        "200":
+          description: quota being set
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quota"
+        "400":
+          description: YOU ARE NOT ADMIN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+  /admin/quota/{userId}:
+    post:
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: user id
+          schema:
+            type: string
+      security:
+        - jwtAuth: []
+      summary: set user quota
+      operationId: SetUserQuota
+      tags:
+        - admin
+        - quota
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Quota"
+      responses:
+        "200":
+          description: quota being set
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quota"
+        "400":
+          description: YOU ARE NOT ADMIN
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+  /template:
+    get:
+      security:
+        - jwtAuth: []
+      summary: get template list
+      operationId: GetTemplateList
+      tags:
+        - template
+      responses:
+        "200":
+          description: get template list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Template"
+        "400":
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+  /user:
+    get:
+      security:
+        - jwtAuth: []
+      summary: get user info
+      operationId: GetUserInfo
+      tags:
+        - user
+      responses:
+        "200":
+          description: get user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+        "400":
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+    post:
+      security:
+        - jwtAuth: []
+      summary: update user info
+      operationId: UpdateUserInfo
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                new_password:
+                  type: string
+      responses:
+        "200":
+          description: update successfully
+        "400":
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+
+  /login:
+    post:
+      summary: Logs in user by set cookie
+      operationId: LoginUser
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Logged in successfully
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: jupyAuth={JWT}; Path=/; HttpOnly
+        "400":
+          description: Invalid ID or PW
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+  /logout:
+    get:
+      summary: Log out user by clear cookie
+      operationId: LogoutUser
+      tags:
+        - user
+      responses:
+        "200":
+          description: OK
+  /server:
+    get:
+      security:
+        - jwtAuth: []
+      summary: Get list of accessible server to user
+      operationId: GetServerList
+      tags:
+        - server
+      responses:
+        "200":
+          description: returns list of server accessible
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServerObject"
+        "400":
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+    post:
+      security:
+        - jwtAuth: []
+      summary: Create server request
+      operationId: CreateServer
+      tags:
+        - server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateServerRequest"
+      responses:
+        "200":
+          description: returns created server
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerObject"
+        "400":
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+        "403":
+          description: refuse to create server
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+  /server/{serverId}:
+    parameters:
+      - name: serverId
+        in: path
+        required: true
+        description: server id
+        schema:
+          type: string
+    get:
+      security:
+        - jwtAuth: []
+      summary: Get server info
+      operationId: GetServer
+      tags:
+        - server
+      responses:
+        "200":
+          description: return info of server
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerObject"
+        "400":
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+        "404":
+          description: server not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+    delete:
+      security:
+        - jwtAuth: []
+      summary: Delete server
+      operationId: DeleteServer
+      tags:
+        - server
+      responses:
+        "200":
+          description: delete server successfully
+        "400":
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+        "404":
+          description: server not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reason"
+components:
+  securitySchemes:
+    jwtAuth:
+      type: apiKey
+      in: cookie
+      name: jupyAuth
+  schemas:
+    LoginRequest:
+      required:
+        - "id"
+        - "pw"
+      properties:
+        id:
+          type: string
+        pw:
+          type: string
+    CreateServerRequest:
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        template_id:
+          type: integer
+        template_variables:
+          $ref: "#/components/schemas/TemplateVariables"
+        flavor:
+          $ref: "#/components/schemas/Flavor"
+    ServerObject:
+      properties:
+        id:
+          type: string
+          description: "id of this server"
+        name:
+          type: string
+          description: "name of this server"
+        description:
+          type: string
+          description: "description of this server"
+        template_id:
+          type: integer
+          description: "template id of this server"
+        template_variables:
+          $ref: "#/components/schemas/TemplateVariables"
+        flavor:
+          $ref: "#/components/schemas/Flavor"
+        created_at:
+          type: string
+          format: date-time
+          example: "2021-01-30T08:30:00Z"
+          description: Creation date and time
+        status:
+          type: string
+          default: "running"
+          enum:
+            - error
+            - stopped
+            - initializing
+            - running
+          description: "show current status of this server"
+        message:
+          type: string
+          description: "show last event of this server. error message will be shown here."
+        last_transition_time:
+          type: string
+          format: date-time
+          example: "2021-01-30T08:30:00Z"
+          description: "timestamp of last transition of this server"
+        last_probe_time:
+          type: string
+          format: date-time
+          example: "2021-01-30T08:30:00Z"
+          description: "timestamp of last health check time"
+        owner:
+          type: array
+          items:
+            type: string
+            description: userId
+          example: ["2016920036", "admin"]
+    TemplateVariables:
+      type: array
+      description: "custom variables of this server"
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          value:
+            type: string
+    Template:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        bdoy:
+          type: string
+          description: kubernetes corev1/pod yaml based template
+        default_variables:
+          $ref: "#/components/schemas/TemplateVariables"
+    Flavor:
+      type: object
+      properties:
+        cpu:
+          type: integer
+          description: cpu size in micro cores (mcore), 1000mcore = 1core
+        memmory:
+          type: integer
+          description: memory size in MiB, 1024MiB = 1GiB
+        nvidia_gpu:
+          type: integer
+          description: gpu unit
+    Quota:
+      type: object
+      properties:
+        instance:
+          type: integer
+          description: instance count
+        cpu:
+          type: integer
+          description: cpu size in micro cores (mcore), 1000mcore = 1core
+        memmory:
+          type: integer
+          description: memory size in MiB, 1024MiB = 1GiB
+        nvidia_gpu:
+          type: integer
+          description: gpu unit
+        storage:
+          type: integer
+          description: storage size in GiB, 1024GiB = 1TiB
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        user_quota:
+          $ref: "#/components/schemas/Quota"
+        group_quota:
+          $ref: "#/components/schemas/Quota"
+    Reason:
+      type: object
+      properties:
+        reason:
+          type: string
+          example: "some message"
