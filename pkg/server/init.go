@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"time"
 
-	"git.iwanhae.kr/wan/jupynetes/pkg/config"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/iwanhae/Jupynetes/pkg/config"
 	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
 )

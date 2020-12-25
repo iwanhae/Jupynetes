@@ -1,4 +1,4 @@
-module git.iwanhae.kr/wan/jupynetes
+module github.com/iwanhae/Jupynetes
 
 go 1.15
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"path/filepath"
 
-	"git.iwanhae.kr/wan/jupynetes/pkg/config"
+	"github.com/iwanhae/Jupynetes/pkg/config"
 	"github.com/rs/zerolog/log"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

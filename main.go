@@ -5,9 +5,9 @@ import (
 	"os"
 	"time"
 
-	"git.iwanhae.kr/wan/jupynetes/pkg/config"
-	"git.iwanhae.kr/wan/jupynetes/pkg/kubeclient"
-	"git.iwanhae.kr/wan/jupynetes/pkg/server"
+	"github.com/iwanhae/Jupynetes/pkg/config"
+	"github.com/iwanhae/Jupynetes/pkg/kubeclient"
+	"github.com/iwanhae/Jupynetes/pkg/server"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )

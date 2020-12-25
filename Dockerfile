@@ -1,7 +1,7 @@
 FROM golang:1.15 as builder
 
 ENV GO111MODULE on
-ENV SRC_DIR $GOPATH/src/git.iwanhae.kr/wan/jupynetes
+ENV SRC_DIR $GOPATH/src/github.com/iwanhae/Jupynetes
 
 COPY . ${SRC_DIR}
 WORKDIR ${SRC_DIR}
