@@ -36,8 +36,33 @@ func InitRouter(c config.Configs) *chi.Mux {
 	// Panic Recover
 	r.Use(middleware.Recoverer)
 
+	server := Server{}
 	// User Application
 
+	// Without Authorization
+	r.Group(func(r chi.Router) {
+		r.Post("/login", server.LoginUser)
+		r.Get("/logout", server.LogoutUser)
+	})
+
+	// User Authorized
+	r.Group(func(r chi.Router) {
+		r.Get("/server", server.GetServerList)
+		r.Post("/server", server.CreateServer)
+		r.Delete("/server/{serverId}", server.DeleteServer)
+		r.Get("/server/{serverId}", server.GetServer)
+		r.Get("/template", server.GetTemplateList)
+		r.Get("/user", server.GetUserInfo)
+		r.Post("/user", server.UpdateUserInfo)
+	})
+
+	// Admin Authorized
+	r.Group(func(r chi.Router) {
+		r.Post("/admin/quota", server.AdminSetQuota)
+		r.Post("/admin/quota/{userId}", server.AdminSetQuota)
+		r.Post("/admin/template", server.AdminCreateTemplate)
+		r.Get("/admin/user", server.AdminGetUserList)
+	})
 	log.Info().Msg("initailizing router finished")
 	return r
 }

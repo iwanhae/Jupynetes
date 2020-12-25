@@ -47,7 +47,7 @@ paths:
       security:
         - jwtAuth: []
       summary: create template
-      operationId: CreateTemplate
+      operationId: AdminCreateTemplate
       tags:
         - admin
         - template
@@ -74,7 +74,7 @@ paths:
       security:
         - jwtAuth: []
       summary: set group quota
-      operationId: SetGroupQuota
+      operationId: AdminSetGroupQuota
       tags:
         - admin
         - quota
@@ -108,7 +108,7 @@ paths:
       security:
         - jwtAuth: []
       summary: set user quota
-      operationId: SetUserQuota
+      operationId: AdminSetUserQuota
       tags:
         - admin
         - quota
