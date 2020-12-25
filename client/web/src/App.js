@@ -1,25 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+import ThemeProvider from '@material-ui/styles/ThemeProvider';
+import { createMuiTheme,  MuiThemeProvider } from '@material-ui/core/styles';
+import LoginScreen from './pages/login/LoginScreen';
+
+const theme = createMuiTheme({
+  typography: {
+    fontFamily: "Roboto",
+    fontSize: 12,
+  },
+});
+
+class Main extends React.Component {
+  render() {
+    return (
+      <ThemeProvider theme={theme}>
+        <div>
+          <LoginScreen></LoginScreen>
+        </div>
+      </ThemeProvider>
+    );
+  }
 }
 
-export default App;
+export default Main;
