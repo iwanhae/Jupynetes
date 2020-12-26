@@ -49,7 +49,7 @@ const cardHeaderStyle = {
       marginBottom: "1px"
     },
     "&$cardHeaderStats$cardHeaderIcon": {
-      textAlign: "right"
+      textAlign: "left"
     }
   },
   cardHeaderPlain: {
