@@ -18,7 +18,13 @@ export default function Dashboard() {
     <div>
       <GridContainer>
         <GridItem xs={12} sm={6} md={3}>
-          <Instance></Instance>
+          <Instance>사과서버</Instance>
+        </GridItem>
+        <GridItem xs={12} sm={6} md={3}>
+          <Instance>감귤서버</Instance>
+        </GridItem>
+        <GridItem xs={12} sm={6} md={3}>
+          <Instance>딸기서버</Instance>
         </GridItem>
       </GridContainer>
     </div>
