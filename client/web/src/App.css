@@ -1,9 +1,7 @@
-@import "~antd/dist/antd.less";
+@import "~antd/dist/antd.css";
 
 .App {
   text-align: center;
-  height: 100vh;
-  vertical-align: middle;
 }
 
 .App-logo {
