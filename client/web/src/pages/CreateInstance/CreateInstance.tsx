@@ -59,79 +59,77 @@ const CreateInstance = () => {
     };
 
     return (
-        <div>
-                  <Button danger style={mypageStyle} onClick={showModal}>인스턴스생성</Button>
-                  <Modal
-                    title="인스턴스 생성"
-                    visible={visible}
-                    onOk={handleOk}
-                    confirmLoading={confirmLoading}
-                    onCancel={handleCancel}
-                  >
-                          <Form
-                              {...layout}
-                              name="basic"
-                              initialValues={{
-                                  remember: true,
-                              }}
-                              onFinish={onFinish}
-                              onFinishFailed={onFinishFailed}
-                          >
-                            <Form.Item
-                            label="아이디"
-                            name="username"
-                            rules={[
-                            {
-                                required: true,
-                                message: 'Please input your username!',
-                            },
-                            ]}>
-                            <Input />
-                            </Form.Item>
-                            <Form.Item
-                                label="기존 비밀번호"
-                                name="passwordOriginal"
-                                rules={[
-                                {
-                                    required: true,
-                                    message: 'Please input your password!',
-                                },
-                                ]}>
-                                <Input.Password />
-                            </Form.Item>
-                            <Form.Item
-                                label="변경할 비밀번호"
-                                name="passwordNew"
-                                rules={[
-                                {
-                                    required: true,
-                                    message: 'Please input your password!',
-                                },
-                                ]}>
-                                <Input.Password />
-                            </Form.Item>
-                            <Form.Item
-                                label="비밀번호 재입력"
-                                name="passwordRetype"
-                                rules={[
-                                {
-                                    required: true,
-                                    message: 'Please input your password!',
-                                },
-                                ]}>
-                                <Input.Password />
-                            </Form.Item>
+        <>
+          <Button danger style={mypageStyle} onClick={showModal}>인스턴스생성</Button>
+            <Modal
+              title="인스턴스 생성"
+              visible={visible}
+              onOk={handleOk}
+              confirmLoading={confirmLoading}
+              onCancel={handleCancel}
+            >
+                <Form
+                    {...layout}
+                    name="basic"
+                    initialValues={{
+                        remember: true,
+                    }}
+                    onFinish={onFinish}
+                    onFinishFailed={onFinishFailed}
+                >
+                <Form.Item
+                label="아이디"
+                name="username"
+                rules={[
+                {
+                    required: true,
+                    message: 'Please input your username!',
+                },
+                ]}>
+                <Input />
+                </Form.Item>
+                <Form.Item
+                    label="기존 비밀번호"
+                    name="passwordOriginal"
+                    rules={[
+                    {
+                        required: true,
+                        message: 'Please input your password!',
+                    },
+                    ]}>
+                    <Input.Password />
+                </Form.Item>
+                <Form.Item
+                    label="변경할 비밀번호"
+                    name="passwordNew"
+                    rules={[
+                    {
+                        required: true,
+                        message: 'Please input your password!',
+                    },
+                    ]}>
+                    <Input.Password />
+                </Form.Item>
+                <Form.Item
+                    label="비밀번호 재입력"
+                    name="passwordRetype"
+                    rules={[
+                    {
+                        required: true,
+                        message: 'Please input your password!',
+                    },
+                    ]}>
+                    <Input.Password />
+                </Form.Item>
 
-                            <Form.Item {...tailLayout}>
-                                <Button type="primary" htmlType="submit">
-                                Submit
-                                </Button>
-                            </Form.Item>
-                    </Form>
-
-
-                  </Modal>
-        </div>
+                <Form.Item {...tailLayout}>
+                    <Button type="primary" htmlType="submit">
+                    Submit
+                    </Button>
+                </Form.Item>
+              </Form>
+            </Modal>
+        </>
     );
 }
 

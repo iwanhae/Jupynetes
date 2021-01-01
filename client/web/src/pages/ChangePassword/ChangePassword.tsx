@@ -3,7 +3,6 @@
 import React, { Component } from 'react'
 import 'antd/dist/antd.css';
 import '../../index.css';
-// import './Dashboard.less';
 import { Button, Modal, Form, Input} from 'antd';
 import CSS from 'csstype';
 

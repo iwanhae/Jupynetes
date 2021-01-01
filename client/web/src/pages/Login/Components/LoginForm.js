@@ -1,5 +1,6 @@
-import React from 'react';
+import {React, useCallback} from 'react';
 import { Typography, Layout, Form, Input, Button, Checkbox} from 'antd';
+import {useHistory} from 'react-router-dom';
 
 import 'antd/dist/antd.css';
 import '../../../index.css';
@@ -30,6 +31,9 @@ const onFinishFailed = (errorInfo) => {
 };
 
 export default function LoginForm(props) {
+    const history = useHistory();
+    const handleOnClickLogin = useCallback(() => history.push('/dashboard'), [history]);
+
     return (
         <div style={{background: 'rgba(255, 255, 0, 1)', width: '30%', margin: "0 auto"}}>
             <div style={{backgorund: 'rgba(255, 0, 0, 1)', width: "80%", margin: "0 auto"}}>
@@ -70,7 +74,7 @@ export default function LoginForm(props) {
                             </Form.Item>
 
                             <Form.Item {...tailLayout}>
-                                <Button type="primary" htmlType="submit">
+                                <Button type="primary" htmlType="submit" onClick={handleOnClickLogin}>
                                 Submit
                                 </Button>
                             </Form.Item>

@@ -3,8 +3,6 @@ import { Button, Card, Row, Col} from 'antd';
 import Instance from './Instance.js';
 import CreateInstance from '../../CreateInstance/CreateInstance';
 
-const style = { background: '#0092ff', padding: '8px 0' };
-
 export default class InstanceList extends Component {
     render() {
         return (
@@ -23,9 +21,7 @@ export default class InstanceList extends Component {
                     <Col className="gutter-row" span={6}>
                     </Col>
                     <Col className="gutter-row" span={6}>
-                        <div style={style}>
-                            <CreateInstance></CreateInstance>
-                        </div>
+                        <CreateInstance></CreateInstance>
                     </Col>
                 </Row>
                 <Card title="내 인스턴스 목록">
