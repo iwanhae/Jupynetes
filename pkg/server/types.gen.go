@@ -22,13 +22,13 @@ type CreateServerRequest struct {
 type Flavor struct {
 
 	// cpu size in micro cores (mcore), 1000mcore = 1core
-	Cpu *int `json:"cpu,omitempty"`
+	Cpu int `json:"cpu"`
 
 	// memory size in MiB, 1024MiB = 1GiB
-	Memmory *int `json:"memmory,omitempty"`
+	Memory int `json:"memory"`
 
 	// gpu unit
-	NvidiaGpu *int `json:"nvidia_gpu,omitempty"`
+	NvidiaGpu int `json:"nvidia_gpu"`
 }
 
 // LoginRequest defines model for LoginRequest.
@@ -41,86 +41,81 @@ type LoginRequest struct {
 type Quota struct {
 
 	// cpu size in micro cores (mcore), 1000mcore = 1core
-	Cpu *int `json:"cpu,omitempty"`
+	Cpu int `json:"cpu"`
 
 	// instance count
-	Instance *int `json:"instance,omitempty"`
+	Instance int `json:"instance"`
 
 	// memory size in MiB, 1024MiB = 1GiB
-	Memmory *int `json:"memmory,omitempty"`
+	Memory int `json:"memory"`
 
 	// gpu unit
-	NvidiaGpu *int `json:"nvidia_gpu,omitempty"`
+	NvidiaGpu int `json:"nvidia_gpu"`
 
 	// storage size in GiB, 1024GiB = 1TiB
-	Storage *int `json:"storage,omitempty"`
+	Storage int `json:"storage"`
 }
 
 // Reason defines model for Reason.
 type Reason struct {
-	Reason *string `json:"reason,omitempty"`
+	Reason string `json:"reason"`
 }
 
 // ServerObject defines model for ServerObject.
 type ServerObject struct {
 
 	// Creation date and time
-	CreatedAt *time.Time `json:"created_at,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
 
 	// description of this server
-	Description *string `json:"description,omitempty"`
-	Flavor      *Flavor `json:"flavor,omitempty"`
+	Description string `json:"description"`
+	Flavor      Flavor `json:"flavor"`
 
 	// id of this server
-	Id *string `json:"id,omitempty"`
+	Id string `json:"id"`
 
 	// timestamp of last health check time
-	LastProbeTime *time.Time `json:"last_probe_time,omitempty"`
+	LastProbeTime time.Time `json:"last_probe_time"`
 
 	// timestamp of last transition of this server
-	LastTransitionTime *time.Time `json:"last_transition_time,omitempty"`
+	LastTransitionTime time.Time `json:"last_transition_time"`
 
 	// show last event of this server. error message will be shown here.
-	Message *string `json:"message,omitempty"`
+	Message string `json:"message"`
 
 	// name of this server
-	Name  *string   `json:"name,omitempty"`
-	Owner *[]string `json:"owner,omitempty"`
+	Name  string   `json:"name"`
+	Owner []string `json:"owner"`
 
 	// show current status of this server
-	Status *string `json:"status,omitempty"`
-
-	// template id of this server
-	TemplateId *int `json:"template_id,omitempty"`
-
-	// custom variables of this server
-	TemplateVariables *TemplateVariables `json:"template_variables,omitempty"`
+	Status   string   `json:"status"`
+	Template Template `json:"template"`
 }
 
 // Template defines model for Template.
 type Template struct {
 
 	// kubernetes corev1/pod yaml based template
-	Bdoy *string `json:"bdoy,omitempty"`
+	Bdoy        string `json:"bdoy"`
+	Description string `json:"description"`
+	Id          int    `json:"id"`
+	Name        string `json:"name"`
 
 	// custom variables of this server
-	DefaultVariables *TemplateVariables `json:"default_variables,omitempty"`
-	Description      *string            `json:"description,omitempty"`
-	Id               *int               `json:"id,omitempty"`
-	Name             *string            `json:"name,omitempty"`
+	Variables TemplateVariables `json:"variables"`
 }
 
 // TemplateVariables defines model for TemplateVariables.
 type TemplateVariables []struct {
-	Name  *string `json:"name,omitempty"`
-	Value *string `json:"value,omitempty"`
+	Name  string `json:"name"`
+	Value string `json:"value"`
 }
 
 // UserInfo defines model for UserInfo.
 type UserInfo struct {
-	GroupQuota *Quota  `json:"group_quota,omitempty"`
-	Id         *string `json:"id,omitempty"`
-	UserQuota  *Quota  `json:"user_quota,omitempty"`
+	GroupQuota Quota  `json:"group_quota"`
+	Id         string `json:"id"`
+	UserQuota  Quota  `json:"user_quota"`
 }
 
 // AdminSetGroupQuotaJSONBody defines parameters for AdminSetGroupQuota.

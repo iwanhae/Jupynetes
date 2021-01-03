@@ -7,11 +7,14 @@ require (
 	github.com/facebook/ent v0.5.3
 	github.com/getkin/kin-openapi v0.34.0
 	github.com/go-chi/chi v4.0.2+incompatible
+	github.com/go-chi/jwtauth v1.1.1
+	github.com/go-chi/render v1.0.1
 	github.com/go-logr/logr v0.3.0 // indirect
 	github.com/go-sql-driver/mysql v1.5.1-0.20200311113236-681ffa848bae
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.5.3 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
+	github.com/lestrrat-go/jwx v1.0.6-0.20201127121120-26218808f029
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/mitchellh/mapstructure v1.4.0 // indirect
 	github.com/pelletier/go-toml v1.8.1 // indirect

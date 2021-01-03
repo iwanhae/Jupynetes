@@ -9,6 +9,7 @@ const (
 	EnvKubernetesCreateNamespaceIfNotPresent = "kubernetes_CreateNamespaceIfNotPresent"
 	EnvDatabaseURI                           = "database_uri"
 	EnvDatabaseSalt                          = "database_salt"
+	EnvSecretKey                             = "secretkey"
 )
 
 //Possible parameters
@@ -20,7 +21,8 @@ const (
 
 //Configs saves configuration needed
 type Configs struct {
-	Deploy string // One of debug, stage or prod
+	Deploy    string // One of debug, stage or prod
+	SecretKey string // used for JWT signing
 
 	Kubernetes struct {
 		Namespace                   string
@@ -39,11 +41,13 @@ func GetConfigs() *Configs {
 	v := viper.New()
 	v.AutomaticEnv()
 	v.SetDefault(EnvDeploy, EnvDeployDebug)
+	v.SetDefault(EnvSecretKey, "e190ufqe2")
 	v.SetDefault(EnvKubernetesNamespace, "jupy")
 	v.SetDefault(EnvKubernetesCreateNamespaceIfNotPresent, false)
 	v.SetDefault(EnvDatabaseSalt, "ab448a918")
 
 	config.Deploy = v.GetString(EnvDeploy)
+	config.SecretKey = v.GetString(EnvSecretKey)
 	config.Kubernetes.Namespace = v.GetString(EnvKubernetesNamespace)
 	config.Kubernetes.CreateNamespaceIfNotPresent = v.GetBool(EnvKubernetesCreateNamespaceIfNotPresent)
 	config.Database.URI = v.GetString(EnvDatabaseURI)

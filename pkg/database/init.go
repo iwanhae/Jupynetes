@@ -23,7 +23,7 @@ func Init(ctx context.Context, c *config.Configs) {
 
 	var err error
 	log.Ctx(ctx).Info().Msg("connecting to db.....")
-	client, err = ent.Open(DBType, c.Database.URI)
+	client, err = ent.Open(DBType, c.Database.URI+"?parseTime=true")
 	if err != nil {
 		log.Fatal().Msgf("failed opening connection to mysql: %v", err)
 	}

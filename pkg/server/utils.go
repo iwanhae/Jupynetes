@@ -1,17 +1,21 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 )
 
-func parseBody(r *http.Request, target interface{}) error {
-	err := json.NewDecoder(r.Body).Decode(target)
-	if err != nil {
-		return err
+func send(w http.ResponseWriter, statusCode int, data interface{}) {
+	buf := &bytes.Buffer{}
+	enc := json.NewEncoder(buf)
+	enc.SetEscapeHTML(true)
+	if err := enc.Encode(data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	/*
-		TODO: Validate if field is not "nonempty"
-	*/
-	return nil
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(statusCode)
+	w.Write(buf.Bytes())
 }

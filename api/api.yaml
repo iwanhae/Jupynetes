@@ -380,6 +380,18 @@ components:
         flavor:
           $ref: "#/components/schemas/Flavor"
     ServerObject:
+      required:
+        - id
+        - name
+        - description
+        - template
+        - flavor
+        - created_at
+        - status
+        - message
+        - last_transition_time
+        - last_probe_time
+        - owner
       properties:
         id:
           type: string
@@ -390,11 +402,8 @@ components:
         description:
           type: string
           description: "description of this server"
-        template_id:
-          type: integer
-          description: "template id of this server"
-        template_variables:
-          $ref: "#/components/schemas/TemplateVariables"
+        template:
+          $ref: "#/components/schemas/Template"
         flavor:
           $ref: "#/components/schemas/Flavor"
         created_at:
@@ -435,6 +444,9 @@ components:
       description: "custom variables of this server"
       items:
         type: object
+        required:
+          - name
+          - value
         properties:
           name:
             type: string
@@ -442,6 +454,12 @@ components:
             type: string
     Template:
       type: object
+      required:
+        - id
+        - name
+        - description
+        - bdoy
+        - variables
       properties:
         id:
           type: integer
@@ -452,15 +470,19 @@ components:
         bdoy:
           type: string
           description: kubernetes corev1/pod yaml based template
-        default_variables:
+        variables:
           $ref: "#/components/schemas/TemplateVariables"
     Flavor:
       type: object
+      required:
+        - cpu
+        - memory
+        - nvidia_gpu
       properties:
         cpu:
           type: integer
           description: cpu size in micro cores (mcore), 1000mcore = 1core
-        memmory:
+        memory:
           type: integer
           description: memory size in MiB, 1024MiB = 1GiB
         nvidia_gpu:
@@ -468,6 +490,12 @@ components:
           description: gpu unit
     Quota:
       type: object
+      required:
+        - instance
+        - cpu
+        - memory
+        - nvidia_gpu
+        - storage
       properties:
         instance:
           type: integer
@@ -475,7 +503,7 @@ components:
         cpu:
           type: integer
           description: cpu size in micro cores (mcore), 1000mcore = 1core
-        memmory:
+        memory:
           type: integer
           description: memory size in MiB, 1024MiB = 1GiB
         nvidia_gpu:
@@ -486,6 +514,10 @@ components:
           description: storage size in GiB, 1024GiB = 1TiB
     UserInfo:
       type: object
+      required:
+        - id
+        - user_quota
+        - group_quota
       properties:
         id:
           type: string
@@ -495,6 +527,8 @@ components:
           $ref: "#/components/schemas/Quota"
     Reason:
       type: object
+      required:
+        - reason
       properties:
         reason:
           type: string
