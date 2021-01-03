@@ -8,7 +8,6 @@ type Server struct{}
 // AdminSetQuota set user quota
 // (POST /admin/quota) and (POST /admin/quota/{userId})
 func (s *Server) AdminSetQuota(w http.ResponseWriter, r *http.Request) {
-
 }
 
 // AdminCreateTemplate create template

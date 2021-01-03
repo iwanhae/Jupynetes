@@ -9,13 +9,13 @@ import (
 
 // CreateServerRequest defines model for CreateServerRequest.
 type CreateServerRequest struct {
-	Description *string `json:"description,omitempty"`
-	Flavor      *Flavor `json:"flavor,omitempty"`
-	Name        *string `json:"name,omitempty"`
-	TemplateId  *int    `json:"template_id,omitempty"`
+	Description string `json:"description"`
+	Flavor      Flavor `json:"flavor"`
+	Name        string `json:"name"`
+	TemplateId  int    `json:"template_id"`
 
 	// custom variables of this server
-	TemplateVariables *TemplateVariables `json:"template_variables,omitempty"`
+	TemplateVariables TemplateVariables `json:"template_variables"`
 }
 
 // Flavor defines model for Flavor.

@@ -7,6 +7,7 @@ const (
 	EnvDeploy                                = "deploy"
 	EnvKubernetesNamespace                   = "kubernetes_Namespace"
 	EnvKubernetesCreateNamespaceIfNotPresent = "kubernetes_CreateNamespaceIfNotPresent"
+	EnvDatabaseURI                           = "database_uri"
 )
 
 //Possible parameters
@@ -24,10 +25,13 @@ type Configs struct {
 		Namespace                   string
 		CreateNamespaceIfNotPresent bool
 	}
+	Database struct {
+		URI string
+	}
 }
 
 //GetConfigs read environment variables and return configuration.
-func GetConfigs() Configs {
+func GetConfigs() *Configs {
 	config := Configs{}
 
 	v := viper.New()
@@ -37,8 +41,9 @@ func GetConfigs() Configs {
 	v.SetDefault(EnvKubernetesCreateNamespaceIfNotPresent, false)
 
 	config.Deploy = v.GetString(EnvDeploy)
-
 	config.Kubernetes.Namespace = v.GetString(EnvKubernetesNamespace)
 	config.Kubernetes.CreateNamespaceIfNotPresent = v.GetBool(EnvKubernetesCreateNamespaceIfNotPresent)
-	return config
+	config.Database.URI = v.GetString(EnvDatabaseURI)
+
+	return &config
 }

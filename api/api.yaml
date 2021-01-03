@@ -362,6 +362,12 @@ components:
         pw:
           type: string
     CreateServerRequest:
+      required:
+        - name
+        - description
+        - template_id
+        - template_variables
+        - flavor
       properties:
         name:
           type: string

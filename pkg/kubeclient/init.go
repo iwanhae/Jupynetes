@@ -17,7 +17,7 @@ import (
 var clientset *kubernetes.Clientset
 
 //Init Initialize k8s client configurations
-func Init(c config.Configs) {
+func Init(ctx context.Context, c *config.Configs) {
 	config, err := rest.InClusterConfig()
 	if err == nil {
 		log.Info().Msg("parsed incluster kubeconfig")

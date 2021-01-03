@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 )
 
 //InitRouter Initialize router
-func InitRouter(c config.Configs) *chi.Mux {
+func InitRouter(ctx context.Context, c *config.Configs) *chi.Mux {
 	r := chi.NewRouter()
 
 	// Default middlwares
