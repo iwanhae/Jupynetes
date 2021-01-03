@@ -8,6 +8,7 @@ const (
 	EnvKubernetesNamespace                   = "kubernetes_Namespace"
 	EnvKubernetesCreateNamespaceIfNotPresent = "kubernetes_CreateNamespaceIfNotPresent"
 	EnvDatabaseURI                           = "database_uri"
+	EnvDatabaseSalt                          = "database_salt"
 )
 
 //Possible parameters
@@ -26,7 +27,8 @@ type Configs struct {
 		CreateNamespaceIfNotPresent bool
 	}
 	Database struct {
-		URI string
+		URI  string
+		Salt string
 	}
 }
 
@@ -39,11 +41,13 @@ func GetConfigs() *Configs {
 	v.SetDefault(EnvDeploy, EnvDeployDebug)
 	v.SetDefault(EnvKubernetesNamespace, "jupy")
 	v.SetDefault(EnvKubernetesCreateNamespaceIfNotPresent, false)
+	v.SetDefault(EnvDatabaseSalt, "ab448a918")
 
 	config.Deploy = v.GetString(EnvDeploy)
 	config.Kubernetes.Namespace = v.GetString(EnvKubernetesNamespace)
 	config.Kubernetes.CreateNamespaceIfNotPresent = v.GetBool(EnvKubernetesCreateNamespaceIfNotPresent)
 	config.Database.URI = v.GetString(EnvDatabaseURI)
+	config.Database.Salt = v.GetString(EnvDatabaseSalt)
 
 	return &config
 }

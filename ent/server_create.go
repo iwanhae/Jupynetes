@@ -91,6 +91,14 @@ func (sc *ServerCreate) SetDeletedAt(t time.Time) *ServerCreate {
 	return sc
 }
 
+// SetNillableDeletedAt sets the deleted_at field if the given value is not nil.
+func (sc *ServerCreate) SetNillableDeletedAt(t *time.Time) *ServerCreate {
+	if t != nil {
+		sc.SetDeletedAt(*t)
+	}
+	return sc
+}
+
 // AddOwnerIDs adds the owners edge to User by ids.
 func (sc *ServerCreate) AddOwnerIDs(ids ...int) *ServerCreate {
 	sc.mutation.AddOwnerIDs(ids...)
@@ -207,9 +215,6 @@ func (sc *ServerCreate) check() error {
 	}
 	if _, ok := sc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New("ent: missing required field \"created_at\"")}
-	}
-	if _, ok := sc.mutation.DeletedAt(); !ok {
-		return &ValidationError{Name: "deleted_at", err: errors.New("ent: missing required field \"deleted_at\"")}
 	}
 	return nil
 }

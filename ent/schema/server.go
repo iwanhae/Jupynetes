@@ -26,7 +26,7 @@ func (Server) Fields() []ent.Field {
 		field.Int("memory"),
 		field.Int("nvidia_gpu"),
 		field.Time("created_at").Default(time.Now),
-		field.Time("deleted_at"),
+		field.Time("deleted_at").Optional(),
 	}
 }
 

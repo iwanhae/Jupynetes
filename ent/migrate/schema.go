@@ -33,7 +33,7 @@ var (
 		{Name: "memory", Type: field.TypeInt},
 		{Name: "nvidia_gpu", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "event_server", Type: field.TypeInt, Nullable: true},
 	}
 	// ServersTable holds the schema information for the "servers" table.
@@ -59,7 +59,7 @@ var (
 		{Name: "template", Type: field.TypeString},
 		{Name: "variables", Type: field.TypeJSON},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 	}
 	// TemplatesTable holds the schema information for the "templates" table.
 	TemplatesTable = &schema.Table{
@@ -79,7 +79,7 @@ var (
 		{Name: "quota_nvidia_gpu", Type: field.TypeInt},
 		{Name: "quota_storage", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

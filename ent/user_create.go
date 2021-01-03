@@ -125,6 +125,14 @@ func (uc *UserCreate) SetDeletedAt(t time.Time) *UserCreate {
 	return uc
 }
 
+// SetNillableDeletedAt sets the deleted_at field if the given value is not nil.
+func (uc *UserCreate) SetNillableDeletedAt(t *time.Time) *UserCreate {
+	if t != nil {
+		uc.SetDeletedAt(*t)
+	}
+	return uc
+}
+
 // AddEventIDs adds the events edge to Event by ids.
 func (uc *UserCreate) AddEventIDs(ids ...int) *UserCreate {
 	uc.mutation.AddEventIDs(ids...)
@@ -273,9 +281,6 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New("ent: missing required field \"created_at\"")}
-	}
-	if _, ok := uc.mutation.DeletedAt(); !ok {
-		return &ValidationError{Name: "deleted_at", err: errors.New("ent: missing required field \"deleted_at\"")}
 	}
 	return nil
 }

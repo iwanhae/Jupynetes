@@ -980,6 +980,20 @@ func DeletedAtLTE(v time.Time) predicate.Server {
 	})
 }
 
+// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
+func DeletedAtIsNil() predicate.Server {
+	return predicate.Server(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldDeletedAt)))
+	})
+}
+
+// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
+func DeletedAtNotNil() predicate.Server {
+	return predicate.Server(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldDeletedAt)))
+	})
+}
+
 // HasOwners applies the HasEdge predicate on the "owners" edge.
 func HasOwners() predicate.Server {
 	return predicate.Server(func(s *sql.Selector) {

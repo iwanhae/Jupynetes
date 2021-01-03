@@ -22,7 +22,7 @@ func (Template) Fields() []ent.Field {
 		field.String("template"),
 		field.JSON("variables", &[]kubeclient.Variable{}),
 		field.Time("created_at").Default(time.Now),
-		field.Time("deleted_at"),
+		field.Time("deleted_at").Optional(),
 	}
 }
 

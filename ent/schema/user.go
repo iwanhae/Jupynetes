@@ -24,7 +24,7 @@ func (User) Fields() []ent.Field {
 		field.Int("quota_nvidia_gpu").Default(0),
 		field.Int("quota_storage").Default(0),
 		field.Time("created_at").Default(time.Now),
-		field.Time("deleted_at"),
+		field.Time("deleted_at").Optional(),
 	}
 }
 

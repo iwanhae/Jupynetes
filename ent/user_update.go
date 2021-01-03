@@ -167,6 +167,20 @@ func (uu *UserUpdate) SetDeletedAt(t time.Time) *UserUpdate {
 	return uu
 }
 
+// SetNillableDeletedAt sets the deleted_at field if the given value is not nil.
+func (uu *UserUpdate) SetNillableDeletedAt(t *time.Time) *UserUpdate {
+	if t != nil {
+		uu.SetDeletedAt(*t)
+	}
+	return uu
+}
+
+// ClearDeletedAt clears the value of deleted_at.
+func (uu *UserUpdate) ClearDeletedAt() *UserUpdate {
+	uu.mutation.ClearDeletedAt()
+	return uu
+}
+
 // AddEventIDs adds the events edge to Event by ids.
 func (uu *UserUpdate) AddEventIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddEventIDs(ids...)
@@ -444,6 +458,12 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: user.FieldDeletedAt,
+		})
+	}
+	if uu.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: user.FieldDeletedAt,
 		})
 	}
@@ -764,6 +784,20 @@ func (uuo *UserUpdateOne) SetDeletedAt(t time.Time) *UserUpdateOne {
 	return uuo
 }
 
+// SetNillableDeletedAt sets the deleted_at field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableDeletedAt(t *time.Time) *UserUpdateOne {
+	if t != nil {
+		uuo.SetDeletedAt(*t)
+	}
+	return uuo
+}
+
+// ClearDeletedAt clears the value of deleted_at.
+func (uuo *UserUpdateOne) ClearDeletedAt() *UserUpdateOne {
+	uuo.mutation.ClearDeletedAt()
+	return uuo
+}
+
 // AddEventIDs adds the events edge to Event by ids.
 func (uuo *UserUpdateOne) AddEventIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddEventIDs(ids...)
@@ -1039,6 +1073,12 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: user.FieldDeletedAt,
+		})
+	}
+	if uuo.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: user.FieldDeletedAt,
 		})
 	}

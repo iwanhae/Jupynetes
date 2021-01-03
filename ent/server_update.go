@@ -119,6 +119,20 @@ func (su *ServerUpdate) SetDeletedAt(t time.Time) *ServerUpdate {
 	return su
 }
 
+// SetNillableDeletedAt sets the deleted_at field if the given value is not nil.
+func (su *ServerUpdate) SetNillableDeletedAt(t *time.Time) *ServerUpdate {
+	if t != nil {
+		su.SetDeletedAt(*t)
+	}
+	return su
+}
+
+// ClearDeletedAt clears the value of deleted_at.
+func (su *ServerUpdate) ClearDeletedAt() *ServerUpdate {
+	su.mutation.ClearDeletedAt()
+	return su
+}
+
 // AddOwnerIDs adds the owners edge to User by ids.
 func (su *ServerUpdate) AddOwnerIDs(ids ...int) *ServerUpdate {
 	su.mutation.AddOwnerIDs(ids...)
@@ -356,6 +370,12 @@ func (su *ServerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: server.FieldDeletedAt,
 		})
 	}
+	if su.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: server.FieldDeletedAt,
+		})
+	}
 	if su.mutation.OwnersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -568,6 +588,20 @@ func (suo *ServerUpdateOne) SetNillableCreatedAt(t *time.Time) *ServerUpdateOne 
 // SetDeletedAt sets the deleted_at field.
 func (suo *ServerUpdateOne) SetDeletedAt(t time.Time) *ServerUpdateOne {
 	suo.mutation.SetDeletedAt(t)
+	return suo
+}
+
+// SetNillableDeletedAt sets the deleted_at field if the given value is not nil.
+func (suo *ServerUpdateOne) SetNillableDeletedAt(t *time.Time) *ServerUpdateOne {
+	if t != nil {
+		suo.SetDeletedAt(*t)
+	}
+	return suo
+}
+
+// ClearDeletedAt clears the value of deleted_at.
+func (suo *ServerUpdateOne) ClearDeletedAt() *ServerUpdateOne {
+	suo.mutation.ClearDeletedAt()
 	return suo
 }
 
@@ -803,6 +837,12 @@ func (suo *ServerUpdateOne) sqlSave(ctx context.Context) (_node *Server, err err
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: server.FieldDeletedAt,
+		})
+	}
+	if suo.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: server.FieldDeletedAt,
 		})
 	}

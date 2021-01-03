@@ -88,6 +88,20 @@ func (tu *TemplateUpdate) SetDeletedAt(t time.Time) *TemplateUpdate {
 	return tu
 }
 
+// SetNillableDeletedAt sets the deleted_at field if the given value is not nil.
+func (tu *TemplateUpdate) SetNillableDeletedAt(t *time.Time) *TemplateUpdate {
+	if t != nil {
+		tu.SetDeletedAt(*t)
+	}
+	return tu
+}
+
+// ClearDeletedAt clears the value of deleted_at.
+func (tu *TemplateUpdate) ClearDeletedAt() *TemplateUpdate {
+	tu.mutation.ClearDeletedAt()
+	return tu
+}
+
 // AddUserIDs adds the user edge to User by ids.
 func (tu *TemplateUpdate) AddUserIDs(ids ...int) *TemplateUpdate {
 	tu.mutation.AddUserIDs(ids...)
@@ -282,6 +296,12 @@ func (tu *TemplateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: template.FieldDeletedAt,
 		})
 	}
+	if tu.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Column: template.FieldDeletedAt,
+		})
+	}
 	if tu.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -463,6 +483,20 @@ func (tuo *TemplateUpdateOne) SetNillableCreatedAt(t *time.Time) *TemplateUpdate
 // SetDeletedAt sets the deleted_at field.
 func (tuo *TemplateUpdateOne) SetDeletedAt(t time.Time) *TemplateUpdateOne {
 	tuo.mutation.SetDeletedAt(t)
+	return tuo
+}
+
+// SetNillableDeletedAt sets the deleted_at field if the given value is not nil.
+func (tuo *TemplateUpdateOne) SetNillableDeletedAt(t *time.Time) *TemplateUpdateOne {
+	if t != nil {
+		tuo.SetDeletedAt(*t)
+	}
+	return tuo
+}
+
+// ClearDeletedAt clears the value of deleted_at.
+func (tuo *TemplateUpdateOne) ClearDeletedAt() *TemplateUpdateOne {
+	tuo.mutation.ClearDeletedAt()
 	return tuo
 }
 
@@ -655,6 +689,12 @@ func (tuo *TemplateUpdateOne) sqlSave(ctx context.Context) (_node *Template, err
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
 			Value:  value,
+			Column: template.FieldDeletedAt,
+		})
+	}
+	if tuo.mutation.DeletedAtCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
 			Column: template.FieldDeletedAt,
 		})
 	}

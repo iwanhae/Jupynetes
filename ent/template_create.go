@@ -75,6 +75,14 @@ func (tc *TemplateCreate) SetDeletedAt(t time.Time) *TemplateCreate {
 	return tc
 }
 
+// SetNillableDeletedAt sets the deleted_at field if the given value is not nil.
+func (tc *TemplateCreate) SetNillableDeletedAt(t *time.Time) *TemplateCreate {
+	if t != nil {
+		tc.SetDeletedAt(*t)
+	}
+	return tc
+}
+
 // AddUserIDs adds the user edge to User by ids.
 func (tc *TemplateCreate) AddUserIDs(ids ...int) *TemplateCreate {
 	tc.mutation.AddUserIDs(ids...)
@@ -176,9 +184,6 @@ func (tc *TemplateCreate) check() error {
 	}
 	if _, ok := tc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New("ent: missing required field \"created_at\"")}
-	}
-	if _, ok := tc.mutation.DeletedAt(); !ok {
-		return &ValidationError{Name: "deleted_at", err: errors.New("ent: missing required field \"deleted_at\"")}
 	}
 	return nil
 }
