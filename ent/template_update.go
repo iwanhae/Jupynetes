@@ -14,7 +14,7 @@ import (
 	"github.com/iwanhae/Jupynetes/ent/server"
 	"github.com/iwanhae/Jupynetes/ent/template"
 	"github.com/iwanhae/Jupynetes/ent/user"
-	"github.com/iwanhae/Jupynetes/pkg/kubeclient"
+	"github.com/iwanhae/Jupynetes/pkg/common"
 )
 
 // TemplateUpdate is the builder for updating Template entities.
@@ -63,8 +63,8 @@ func (tu *TemplateUpdate) SetTemplate(s string) *TemplateUpdate {
 }
 
 // SetVariables sets the variables field.
-func (tu *TemplateUpdate) SetVariables(k *[]kubeclient.Variable) *TemplateUpdate {
-	tu.mutation.SetVariables(k)
+func (tu *TemplateUpdate) SetVariables(cv *common.TemplateVariables) *TemplateUpdate {
+	tu.mutation.SetVariables(cv)
 	return tu
 }
 
@@ -461,8 +461,8 @@ func (tuo *TemplateUpdateOne) SetTemplate(s string) *TemplateUpdateOne {
 }
 
 // SetVariables sets the variables field.
-func (tuo *TemplateUpdateOne) SetVariables(k *[]kubeclient.Variable) *TemplateUpdateOne {
-	tuo.mutation.SetVariables(k)
+func (tuo *TemplateUpdateOne) SetVariables(cv *common.TemplateVariables) *TemplateUpdateOne {
+	tuo.mutation.SetVariables(cv)
 	return tuo
 }
 

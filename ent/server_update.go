@@ -14,7 +14,7 @@ import (
 	"github.com/iwanhae/Jupynetes/ent/server"
 	"github.com/iwanhae/Jupynetes/ent/template"
 	"github.com/iwanhae/Jupynetes/ent/user"
-	"github.com/iwanhae/Jupynetes/pkg/kubeclient"
+	"github.com/iwanhae/Jupynetes/pkg/common"
 )
 
 // ServerUpdate is the builder for updating Server entities.
@@ -43,8 +43,8 @@ func (su *ServerUpdate) SetTemplate(s string) *ServerUpdate {
 }
 
 // SetVariables sets the variables field.
-func (su *ServerUpdate) SetVariables(k *[]kubeclient.Variable) *ServerUpdate {
-	su.mutation.SetVariables(k)
+func (su *ServerUpdate) SetVariables(cv *common.TemplateVariables) *ServerUpdate {
+	su.mutation.SetVariables(cv)
 	return su
 }
 
@@ -515,8 +515,8 @@ func (suo *ServerUpdateOne) SetTemplate(s string) *ServerUpdateOne {
 }
 
 // SetVariables sets the variables field.
-func (suo *ServerUpdateOne) SetVariables(k *[]kubeclient.Variable) *ServerUpdateOne {
-	suo.mutation.SetVariables(k)
+func (suo *ServerUpdateOne) SetVariables(cv *common.TemplateVariables) *ServerUpdateOne {
+	suo.mutation.SetVariables(cv)
 	return suo
 }
 

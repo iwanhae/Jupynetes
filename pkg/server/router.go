@@ -8,15 +8,27 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/jwtauth"
+	"github.com/iwanhae/Jupynetes/pkg/common"
 	"github.com/iwanhae/Jupynetes/pkg/config"
 	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
 )
 
 var tokenAuth *jwtauth.JWTAuth
+var rootQuota common.Quota
 
 //InitRouter Initialize router
 func InitRouter(ctx context.Context, c *config.Configs) *chi.Mux {
+
+	tokenAuth = jwtauth.New("HS256", []byte(c.SecretKey), nil)
+	rootQuota = common.Quota{
+		Instance:  c.Quota.Instance,
+		Cpu:       c.Quota.Cpu,
+		Memory:    c.Quota.Memory,
+		NvidiaGpu: c.Quota.NvidiaGpu,
+		Storage:   c.Quota.Storage,
+	}
+
 	r := chi.NewRouter()
 
 	// Default middlwares
@@ -40,8 +52,6 @@ func InitRouter(ctx context.Context, c *config.Configs) *chi.Mux {
 	// Panic Recover
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.AllowContentType("application/json"))
-
-	tokenAuth = jwtauth.New("HS256", []byte(c.SecretKey), nil)
 
 	// User Application
 	r.Route("/v1", func(r chi.Router) {
@@ -84,7 +94,7 @@ func InitRouter(ctx context.Context, c *config.Configs) *chi.Mux {
 func chkAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if GetUser(r.Context()) != "admin" {
-			send(w, http.StatusUnauthorized, Reason{"you are not admin :-("})
+			send(w, http.StatusUnauthorized, common.GetReason("you are not admin :-("))
 			return
 		}
 		next.ServeHTTP(w, r)

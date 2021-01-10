@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-chi/jwtauth"
+	"github.com/iwanhae/Jupynetes/pkg/common"
 	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -15,27 +16,28 @@ var userKey = &struct {
 	key string
 }{"user_id"}
 
+//AuthorizeUser middleware for validating user token and embed to userinfo to context
 func AuthorizeUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, claims, err := jwtauth.FromContext(r.Context())
 
 		if err != nil {
-			send(w, http.StatusUnauthorized, Reason{"fail to parse token"})
+			send(w, http.StatusUnauthorized, common.GetReason("fail to parse token"))
 			return
 		}
 
 		if token == nil || jwt.Validate(token) != nil {
-			send(w, http.StatusUnauthorized, Reason{"fail to validate token"})
+			send(w, http.StatusUnauthorized, common.GetReason("fail to validate token"))
 			return
 		}
 
 		user, ok := claims["user_id"].(string)
 		if !ok {
-			send(w, http.StatusUnauthorized, Reason{"fail to parse user_id from token"})
+			send(w, http.StatusUnauthorized, common.GetReason("fail to parse user_id from token"))
 			return
 		}
 		if user == "" {
-			send(w, http.StatusUnauthorized, Reason{"invalid user_id"})
+			send(w, http.StatusUnauthorized, common.GetReason("invalid user_id"))
 			return
 		}
 

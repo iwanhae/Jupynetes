@@ -10,7 +10,7 @@ import (
 
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/iwanhae/Jupynetes/ent/template"
-	"github.com/iwanhae/Jupynetes/pkg/kubeclient"
+	"github.com/iwanhae/Jupynetes/pkg/common"
 )
 
 // Template is the model entity for the Template schema.
@@ -25,7 +25,7 @@ type Template struct {
 	// Template holds the value of the "template" field.
 	Template string `json:"template,omitempty"`
 	// Variables holds the value of the "variables" field.
-	Variables *[]kubeclient.Variable `json:"variables,omitempty"`
+	Variables *common.TemplateVariables `json:"variables,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.

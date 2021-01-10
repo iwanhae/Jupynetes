@@ -10,7 +10,7 @@ import (
 
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/iwanhae/Jupynetes/ent/server"
-	"github.com/iwanhae/Jupynetes/pkg/kubeclient"
+	"github.com/iwanhae/Jupynetes/pkg/common"
 )
 
 // Server is the model entity for the Server schema.
@@ -23,7 +23,7 @@ type Server struct {
 	// Template holds the value of the "template" field.
 	Template string `json:"template,omitempty"`
 	// Variables holds the value of the "variables" field.
-	Variables *[]kubeclient.Variable `json:"variables,omitempty"`
+	Variables *common.TemplateVariables `json:"variables,omitempty"`
 	// IP holds the value of the "ip" field.
 	IP string `json:"ip,omitempty"`
 	// Description holds the value of the "description" field.

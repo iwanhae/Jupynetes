@@ -13,7 +13,7 @@ import (
 	"github.com/iwanhae/Jupynetes/ent/server"
 	"github.com/iwanhae/Jupynetes/ent/template"
 	"github.com/iwanhae/Jupynetes/ent/user"
-	"github.com/iwanhae/Jupynetes/pkg/kubeclient"
+	"github.com/iwanhae/Jupynetes/pkg/common"
 
 	"github.com/facebook/ent"
 )
@@ -565,7 +565,7 @@ type ServerMutation struct {
 	id                   *int
 	name                 *string
 	template             *string
-	variables            **[]kubeclient.Variable
+	variables            **common.TemplateVariables
 	ip                   *string
 	description          *string
 	cpu                  *int
@@ -742,12 +742,12 @@ func (m *ServerMutation) ResetTemplate() {
 }
 
 // SetVariables sets the variables field.
-func (m *ServerMutation) SetVariables(k *[]kubeclient.Variable) {
-	m.variables = &k
+func (m *ServerMutation) SetVariables(cv *common.TemplateVariables) {
+	m.variables = &cv
 }
 
 // Variables returns the variables value in the mutation.
-func (m *ServerMutation) Variables() (r *[]kubeclient.Variable, exists bool) {
+func (m *ServerMutation) Variables() (r *common.TemplateVariables, exists bool) {
 	v := m.variables
 	if v == nil {
 		return
@@ -759,7 +759,7 @@ func (m *ServerMutation) Variables() (r *[]kubeclient.Variable, exists bool) {
 // If the Server object wasn't provided to the builder, the object is fetched
 // from the database.
 // An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *ServerMutation) OldVariables(ctx context.Context) (v *[]kubeclient.Variable, err error) {
+func (m *ServerMutation) OldVariables(ctx context.Context) (v *common.TemplateVariables, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldVariables is allowed only on UpdateOne operations")
 	}
@@ -1342,7 +1342,7 @@ func (m *ServerMutation) SetField(name string, value ent.Value) error {
 		m.SetTemplate(v)
 		return nil
 	case server.FieldVariables:
-		v, ok := value.(*[]kubeclient.Variable)
+		v, ok := value.(*common.TemplateVariables)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1653,7 +1653,7 @@ type TemplateMutation struct {
 	name          *string
 	description   *string
 	template      *string
-	variables     **[]kubeclient.Variable
+	variables     **common.TemplateVariables
 	created_at    *time.Time
 	deleted_at    *time.Time
 	clearedFields map[string]struct{}
@@ -1872,12 +1872,12 @@ func (m *TemplateMutation) ResetTemplate() {
 }
 
 // SetVariables sets the variables field.
-func (m *TemplateMutation) SetVariables(k *[]kubeclient.Variable) {
-	m.variables = &k
+func (m *TemplateMutation) SetVariables(cv *common.TemplateVariables) {
+	m.variables = &cv
 }
 
 // Variables returns the variables value in the mutation.
-func (m *TemplateMutation) Variables() (r *[]kubeclient.Variable, exists bool) {
+func (m *TemplateMutation) Variables() (r *common.TemplateVariables, exists bool) {
 	v := m.variables
 	if v == nil {
 		return
@@ -1889,7 +1889,7 @@ func (m *TemplateMutation) Variables() (r *[]kubeclient.Variable, exists bool) {
 // If the Template object wasn't provided to the builder, the object is fetched
 // from the database.
 // An error is returned if the mutation operation is not UpdateOne, or database query fails.
-func (m *TemplateMutation) OldVariables(ctx context.Context) (v *[]kubeclient.Variable, err error) {
+func (m *TemplateMutation) OldVariables(ctx context.Context) (v *common.TemplateVariables, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldVariables is allowed only on UpdateOne operations")
 	}
@@ -2206,7 +2206,7 @@ func (m *TemplateMutation) SetField(name string, value ent.Value) error {
 		m.SetTemplate(v)
 		return nil
 	case template.FieldVariables:
-		v, ok := value.(*[]kubeclient.Variable)
+		v, ok := value.(*common.TemplateVariables)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

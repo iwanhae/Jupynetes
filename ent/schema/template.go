@@ -6,7 +6,7 @@ import (
 	"github.com/facebook/ent"
 	"github.com/facebook/ent/schema/edge"
 	"github.com/facebook/ent/schema/field"
-	"github.com/iwanhae/Jupynetes/pkg/kubeclient"
+	"github.com/iwanhae/Jupynetes/pkg/common"
 )
 
 // Template holds the schema definition for the Template entity.
@@ -20,7 +20,7 @@ func (Template) Fields() []ent.Field {
 		field.String("name").Unique(),
 		field.String("description").Optional(),
 		field.String("template"),
-		field.JSON("variables", &[]kubeclient.Variable{}),
+		field.JSON("variables", &common.TemplateVariables{}),
 		field.Time("created_at").Default(time.Now),
 		field.Time("deleted_at").Optional(),
 	}

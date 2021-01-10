@@ -1,7 +1,7 @@
 package main
 
-//go:generate oapi-codegen --package=server --generate types -o pkg/server/types.gen.go api/api.yaml
-//go:generate oapi-codegen --package=server --generate spec -o pkg/server/spec.gen.go api/api.yaml
+//go:generate oapi-codegen --package=common --generate types -o pkg/common/types.gen.go api/api.yaml
+//go:generate oapi-codegen --package=common --generate spec -o pkg/common/spec.gen.go api/api.yaml
 
 import (
 	"context"

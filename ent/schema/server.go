@@ -6,7 +6,7 @@ import (
 	"github.com/facebook/ent"
 	"github.com/facebook/ent/schema/edge"
 	"github.com/facebook/ent/schema/field"
-	"github.com/iwanhae/Jupynetes/pkg/kubeclient"
+	"github.com/iwanhae/Jupynetes/pkg/common"
 )
 
 // Server holds the schema definition for the Server entity.
@@ -19,7 +19,7 @@ func (Server) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
 		field.String("template"),
-		field.JSON("variables", &[]kubeclient.Variable{}),
+		field.JSON("variables", &common.TemplateVariables{}),
 		field.String("ip"),
 		field.String("description"),
 		field.Int("cpu"),

@@ -1,13 +1,15 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/render"
+	"github.com/iwanhae/Jupynetes/ent/template"
 	"github.com/iwanhae/Jupynetes/ent/user"
 	"github.com/iwanhae/Jupynetes/pkg/database"
 	"github.com/rs/zerolog/log"
+
+	"github.com/iwanhae/Jupynetes/pkg/common"
 )
 
 //Server dummy routing sturct
@@ -15,26 +17,95 @@ type Server struct{}
 
 // AdminSetQuota set user quota
 // (POST /admin/quota) and (POST /admin/quota/{userId})
-func (s *Server) AdminSetQuota(w http.ResponseWriter, r *http.Request) {
-}
+func (s *Server) AdminSetQuota(w http.ResponseWriter, r *http.Request) {}
 
 // AdminCreateTemplate create template
 // (POST /admin/template)
 func (s *Server) AdminCreateTemplate(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 
+	req := &common.Template{}
+	if err := render.Bind(r, req); err != nil {
+		log.Ctx(ctx).Error().Err(err).Msg("invalid format")
+		send(w, http.StatusBadRequest, common.Reason{
+			Reason: "Invalid format",
+		})
+		return
+	}
+	log.Ctx(ctx).Info().Interface("template", req).Msg("will create template")
+
+	db := database.GetClient()
+	templates, err := db.Template.Query().Where(
+		template.NameEQ(req.Name),
+	).All(ctx)
+
+	if err != nil {
+		log.Ctx(ctx).Error().Err(err).Msg("fail to query template from db")
+		send(w, http.StatusInternalServerError, common.GetReason("unexpected db error"))
+		return
+	}
+
+	if len(templates) != 0 {
+		log.Ctx(ctx).Error().Str("template_name", req.Name).Msg("template name already exists")
+		send(w, http.StatusConflict, common.GetReasonf("%q already exists", req.Name))
+		return
+	}
+
+	// TODO: Template Validation with kubectl --dry-run
+
+	template, err := db.Template.Create().
+		SetName(req.Name).
+		SetDescription(req.Description).
+		SetTemplate(req.Body).
+		SetVariables(&req.Variables).Save(ctx)
+
+	if err != nil {
+		log.Ctx(ctx).Error().Err(err).Msg("fail to query template to db")
+		send(w, http.StatusInternalServerError, common.GetReason("unexpected db error"))
+		return
+	}
+
+	res := template.ToCommonType()
+
+	send(w, http.StatusAccepted, res)
 }
 
 // AdminGetUserList get user list
 // (GET /admin/user)
-func (s *Server) AdminGetUserList(w http.ResponseWriter, r *http.Request) {}
+func (s *Server) AdminGetUserList(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	db := database.GetClient()
+	users, err := db.User.Query().All(ctx)
+	if err != nil {
+		log.Ctx(ctx).Error().Err(err).Msg("fail to query user list from db")
+		send(w, http.StatusInternalServerError, common.GetReason("unexpected db error"))
+	}
+
+	res := []common.UserInfo{}
+	for _, user := range users {
+		res = append(res, common.UserInfo{
+			Id: user.UserID,
+			UserQuota: common.Quota{
+				Instance:  user.QuotaInstance,
+				Cpu:       user.QuotaCPU,
+				Memory:    user.QuotaMemory,
+				NvidiaGpu: user.QuotaNvidiaGpu,
+				Storage:   user.QuotaStorage,
+			},
+			GroupQuota: rootQuota,
+		})
+	}
+	send(w, http.StatusOK, res)
+}
 
 // LoginUser Logs in user by set cookie
 // (POST /login)
 func (s *Server) LoginUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	req := &LoginRequest{}
+	req := &common.LoginRequest{}
 	if err := render.Bind(r, req); err != nil {
-		send(w, http.StatusBadRequest, Reason{
+		send(w, http.StatusBadRequest, common.Reason{
 			Reason: "Invalid format",
 		})
 		return
@@ -44,31 +115,31 @@ func (s *Server) LoginUser(w http.ResponseWriter, r *http.Request) {
 	user, err := db.User.Query().Where(user.UserIDEQ(req.Id)).All(ctx)
 	if err != nil {
 		log.Ctx(ctx).Error().Err(err).Msg("fail to query db")
-		send(w, http.StatusInternalServerError, Reason{"unexpected db error"})
+		send(w, http.StatusInternalServerError, common.GetReason("unexpected db error"))
 		return
 	}
 	if len(user) == 0 {
 		log.Ctx(ctx).Error().
 			Str("user_id", req.Id).
 			Msg("auth failed:user not found")
-		send(w, http.StatusBadRequest, Reason{"invalid id or pw"})
+		send(w, http.StatusBadRequest, common.GetReason("invalid id or pw"))
 		return
 	}
 	if database.IsEqualPassword(user[0].UserPw, req.Pw) == false {
 		log.Ctx(ctx).Error().
 			Str("user_id", req.Id).
 			Msg("auth failed:wrong password")
-		send(w, http.StatusBadRequest, Reason{"invalid id or pw"})
+		send(w, http.StatusBadRequest, common.GetReason("invalid id or pw"))
 		return
 	}
 	cookie, err := GenerateTokenCookie(req.Id)
 	if err != nil {
 		log.Ctx(ctx).Error().Err(err).Str("user_id", req.Id).Msg("fail to write jwt")
-		send(w, http.StatusInternalServerError, Reason{"signing error"})
+		send(w, http.StatusInternalServerError, common.GetReason("signing error"))
 		return
 	}
 	http.SetCookie(w, cookie)
-	send(w, http.StatusOK, Reason{fmt.Sprintf("Welcome %q :-)", req.Id)})
+	send(w, http.StatusOK, common.GetReasonf("Welcome %q :-)", req.Id))
 
 	log.Ctx(ctx).Info().Str("user_id", req.Id).Msg("logged in")
 	return
@@ -82,7 +153,7 @@ func (s *Server) LogoutUser(w http.ResponseWriter, r *http.Request) {
 		Value:  "",
 		MaxAge: -1,
 	})
-	send(w, http.StatusOK, Reason{"you are logged out. :-)"})
+	send(w, http.StatusOK, common.GetReason("you are logged out. :-)"))
 	return
 }
 

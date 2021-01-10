@@ -13,7 +13,7 @@ import (
 	"github.com/iwanhae/Jupynetes/ent/server"
 	"github.com/iwanhae/Jupynetes/ent/template"
 	"github.com/iwanhae/Jupynetes/ent/user"
-	"github.com/iwanhae/Jupynetes/pkg/kubeclient"
+	"github.com/iwanhae/Jupynetes/pkg/common"
 )
 
 // TemplateCreate is the builder for creating a Template entity.
@@ -50,8 +50,8 @@ func (tc *TemplateCreate) SetTemplate(s string) *TemplateCreate {
 }
 
 // SetVariables sets the variables field.
-func (tc *TemplateCreate) SetVariables(k *[]kubeclient.Variable) *TemplateCreate {
-	tc.mutation.SetVariables(k)
+func (tc *TemplateCreate) SetVariables(cv *common.TemplateVariables) *TemplateCreate {
+	tc.mutation.SetVariables(cv)
 	return tc
 }
 

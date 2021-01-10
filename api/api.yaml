@@ -443,22 +443,24 @@ components:
       type: array
       description: "custom variables of this server"
       items:
-        type: object
-        required:
-          - name
-          - value
-        properties:
-          name:
-            type: string
-          value:
-            type: string
+        $ref: "#/components/schemas/TemplateVariable"
+    TemplateVariable:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+        value:
+          type: string
     Template:
       type: object
       required:
         - id
         - name
         - description
-        - bdoy
+        - body
         - variables
       properties:
         id:
@@ -467,7 +469,7 @@ components:
           type: string
         description:
           type: string
-        bdoy:
+        body:
           type: string
           description: kubernetes corev1/pod yaml based template
         variables:

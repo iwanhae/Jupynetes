@@ -13,7 +13,7 @@ import (
 	"github.com/iwanhae/Jupynetes/ent/server"
 	"github.com/iwanhae/Jupynetes/ent/template"
 	"github.com/iwanhae/Jupynetes/ent/user"
-	"github.com/iwanhae/Jupynetes/pkg/kubeclient"
+	"github.com/iwanhae/Jupynetes/pkg/common"
 )
 
 // ServerCreate is the builder for creating a Server entity.
@@ -36,8 +36,8 @@ func (sc *ServerCreate) SetTemplate(s string) *ServerCreate {
 }
 
 // SetVariables sets the variables field.
-func (sc *ServerCreate) SetVariables(k *[]kubeclient.Variable) *ServerCreate {
-	sc.mutation.SetVariables(k)
+func (sc *ServerCreate) SetVariables(cv *common.TemplateVariables) *ServerCreate {
+	sc.mutation.SetVariables(cv)
 	return sc
 }
 
