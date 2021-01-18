@@ -26,14 +26,14 @@ export class ServerObject {
   owner: string[];
 
   constructor() {
-    this.id = "";
-    this.name = "";
-    this.description = "";
+    this.id = "3";
+    this.name = "sdfdf";
+    this.description = "dfdf";
     this.template = new Template();
     this.flavor = new Flavor();
     this.created_at = "";
-    this.status = "";
-    this.message = "";
+    this.status = "error";
+    this.message = "dfdf";
     this.last_transition_time = "";
     this.last_probe_time = "";
     this.owner = [];
