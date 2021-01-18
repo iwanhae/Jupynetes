@@ -1,11 +1,11 @@
 
 
-import React, { Component } from 'react'
+import React from 'react'
 import 'antd/dist/antd.css';
 import '../../index.css';
-// import './Dashboard.less';
-import { Button, Modal, Form, Input} from 'antd';
+import { Button, Modal, Form, Input, Dropdown, Menu} from 'antd';
 import CSS from 'csstype';
+import { DownOutlined, UserOutlined } from '@ant-design/icons';
 
 const mypageStyle: CSS.Properties ={
     margin: '1rem',
@@ -26,6 +26,37 @@ const tailLayout = {
     span: 12,
   },
 };
+
+const menu = (
+  <Menu onClick={handleMenuClick}>
+    <Menu.Item key="1" icon={<UserOutlined />}>
+      상
+    </Menu.Item>
+    <Menu.Item key="2" icon={<UserOutlined />}>
+      중
+    </Menu.Item>
+    <Menu.Item key="3" icon={<UserOutlined />}>
+      하
+    </Menu.Item>
+  </Menu>
+);
+
+const storageMenu = (
+  <Menu onClick={handleMenuClick}>
+    <Menu.Item key="1" icon={<UserOutlined />}>
+      상
+    </Menu.Item>
+    <Menu.Item key="2" icon={<UserOutlined />}>
+      중
+    </Menu.Item>
+    <Menu.Item key="3" icon={<UserOutlined />}>
+      하
+    </Menu.Item>
+  </Menu>
+);
+
+function handleMenuClick() {
+}
 
 const onFinish = (values: String) => {
     console.log('Success:', values);
@@ -78,54 +109,56 @@ const CreateInstance = () => {
                     onFinishFailed={onFinishFailed}
                 >
                 <Form.Item
-                label="아이디"
-                name="username"
+                label="서버이름"
+                name="servername"
                 rules={[
                 {
                     required: true,
-                    message: 'Please input your username!',
+                    message: '서버명을 입력해 주세요.',
                 },
                 ]}>
                 <Input />
                 </Form.Item>
                 <Form.Item
-                    label="기존 비밀번호"
-                    name="passwordOriginal"
+                    label="서버설명"
+                    name="description"
                     rules={[
                     {
                         required: true,
-                        message: 'Please input your password!',
+                        message: '간단한 설명을 입력해 주세요.',
                     },
                     ]}>
                     <Input.Password />
                 </Form.Item>
                 <Form.Item
-                    label="변경할 비밀번호"
-                    name="passwordNew"
+                    label="Flavor"
+                    name="flavor"
                     rules={[
                     {
                         required: true,
-                        message: 'Please input your password!',
+                        message: '서버 사양을 선택해 주세요.',
                     },
                     ]}>
-                    <Input.Password />
-                </Form.Item>
-                <Form.Item
-                    label="비밀번호 재입력"
-                    name="passwordRetype"
-                    rules={[
-                    {
-                        required: true,
-                        message: 'Please input your password!',
-                    },
-                    ]}>
-                    <Input.Password />
-                </Form.Item>
-
-                <Form.Item {...tailLayout}>
-                    <Button type="primary" htmlType="submit">
-                    Submit
+                    <Dropdown overlay={menu}>
+                    <Button>
+                      선택 <DownOutlined />
                     </Button>
+                </Dropdown>
+                </Form.Item>
+                <Form.Item
+                    label="Storage"
+                    name="storage"
+                    rules={[
+                    {
+                        required: true,
+                        message: '디스크 사양을 선택해 주세요.',
+                    },
+                    ]}>
+                    <Dropdown overlay={storageMenu}>
+                    <Button>
+                      선택 <DownOutlined />
+                    </Button>
+                </Dropdown>
                 </Form.Item>
               </Form>
             </Modal>
