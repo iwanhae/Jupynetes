@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { Button } from 'antd';
 import './App.css';
-import Dashboard from "./pages/Dashboard/Dashboard";
+import Dashboard from "./pages/Dashboard/Components/Dashboard";
 
 import { createBrowserHistory } from "history";
 import { Router, Route, Switch, Redirect } from "react-router-dom";

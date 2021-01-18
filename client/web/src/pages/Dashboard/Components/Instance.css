@@ -1,0 +1,31 @@
+.redCircle {
+  height: 25px;
+  width: 25px;
+  background-color: #f00;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.yellowCircle {
+  height: 25px;
+  width: 25px;
+  background-color: #ff0;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.greenCircle {
+  height: 25px;
+  width: 25px;
+  background-color: #0f0;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.greyCircle {
+  height: 25px;
+  width: 25px;
+  background-color: #440;
+  border-radius: 50%;
+  display: inline-block;
+}

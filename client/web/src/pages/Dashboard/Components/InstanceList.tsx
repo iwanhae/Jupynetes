@@ -1,10 +1,13 @@
-import React, { Component } from 'react'
-import { Button, Card, Row, Col} from 'antd';
-import Instance from './Instance.js';
+import React, { FC } from 'react'
+import {  Card, Row, Col} from 'antd';
 import CreateInstance from '../../CreateInstance/CreateInstance';
+import appState from '../../../AppState';
+import { ServerObject } from '../../../model/ServerObject';
+import InstanceContainer from '../Container/InstanceContainer';
+import { useObserver } from "mobx-react";
 
-export default class InstanceList extends Component {
-    render() {
+ const InstanceList: FC<Object> = () =>  {
+    return useObserver(() => {
         return (
             <>
                 <div id="test">
@@ -25,13 +28,14 @@ export default class InstanceList extends Component {
                     </Col>
                 </Row>
                 <Card title="내 인스턴스 목록">
-                    <Instance/>
-                    <Instance/>
-                    <Instance/>
-                    <Instance/>
-                    <Instance/>
+                    {appState.servers.map(function(item:ServerObject) {
+                        return <InstanceContainer serverData={item}></InstanceContainer>;
+                    })}
                 </Card>
             </>
         )
-    }
+    });
 }
+
+export default InstanceList;
+

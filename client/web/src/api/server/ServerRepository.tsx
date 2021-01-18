@@ -1,4 +1,5 @@
 import { plainToClass } from "class-transformer";
+import { ServerResponse } from "http";
 import { ServerObject } from "../../model/ServerObject";
 
 export class ServerRepository {
@@ -11,8 +12,11 @@ export class ServerRepository {
 
     async getServers(){
         let result:string = await this.provider.getServers();
+        console.log("getServers: " + result);
         let json = JSON.parse(result);
+        console.log("getServers: " + json);
         let servers = plainToClass(ServerObject, json as any[]);
+        console.log("length of server" + servers.length);
         return servers;
     }
 
@@ -43,13 +47,13 @@ class ServerFakeProvider {
     getServers():string {
         return `[
             {
-                "id": "string",
-                "name": "string",
-                "description": "string",
+                "id": "1",
+                "name": "사과서버",
+                "description": "사과서버입니다.",
                 "template": {
                 "id": 0,
-                "name": "string",
-                "description": "string",
+                "name": "사과템플릿",
+                "description": "사과템플릿입니다.",
                 "bdoy": "string",
                 "variables": [
                     {
@@ -59,15 +63,46 @@ class ServerFakeProvider {
                 ]
                 },
                 "flavor": {
-                "cpu": 0,
-                "memory": 0,
-                "nvidia_gpu": 0
+                "cpu": 55,
+                "memory": 22,
+                "nvidia_gpu": 44
                 },
-                "created_at": "2021-01-30T08:30:00Z",
+                "created_at": "2021-01-02T08:30:00Z",
                 "status": "running",
                 "message": "string",
-                "last_transition_time": "2021-01-30T08:30:00Z",
-                "last_probe_time": "2021-01-30T08:30:00Z",
+                "last_transition_time": "2021-01-02T08:30:00Z",
+                "last_probe_time": "2021-01-02T08:30:00Z",
+                "owner": [
+                "2016920036",
+                "admin"
+                ]
+            },
+            {
+                "id": "2",
+                "name": "오렌지서버",
+                "description": "사과서버입니다.",
+                "template": {
+                "id": 0,
+                "name": "사과템플릿",
+                "description": "사과템플릿입니다.",
+                "bdoy": "string",
+                "variables": [
+                    {
+                    "name": "string",
+                    "value": "string"
+                    }
+                ]
+                },
+                "flavor": {
+                "cpu": 55,
+                "memory": 22,
+                "nvidia_gpu": 44
+                },
+                "created_at": "2021-01-11T08:30:00Z",
+                "status": "error",
+                "message": "string",
+                "last_transition_time": "2021-01-11T08:30:00Z",
+                "last_probe_time": "2021-01-11T08:30:00Z",
                 "owner": [
                 "2016920036",
                 "admin"

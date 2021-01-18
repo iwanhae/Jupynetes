@@ -2,20 +2,19 @@
 
 import React, { Component } from 'react'
 import 'antd/dist/antd.css';
-import '../../index.css';
+import '../../../index.css';
 import './Dashboard.less';
-import InstanceList from './Components/InstanceList.js';
-import ChangePassword from '../ChangePassword/ChangePassword';
+import ChangePassword from '../../ChangePassword/ChangePassword';
 import { Layout, Button, Row, Col} from 'antd';
 import CSS from 'csstype';
+import { InstanceListContainer } from '../Container/InstanceListContainer';
 
-const { Header, Footer, Content } = Layout;
+const { Header, Footer, } = Layout;
 const mypageStyle: CSS.Properties ={
     margin: '0 auto',
     float: 'right',
     marginRight: '5px'
 }
-
 
 const Dashboard = () => {
     return (
@@ -32,7 +31,7 @@ const Dashboard = () => {
                     </Col>
                   </Row>
                 </Header>
-                <InstanceList/>
+                <InstanceListContainer/>
                 <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
             </Layout>
         </>

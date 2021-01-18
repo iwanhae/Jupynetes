@@ -1,22 +1,32 @@
-import { observable, makeObservable } from "mobx";
+import { observable, makeObservable, action } from "mobx";
 import { ServerRepository } from './api/server/ServerRepository';
 import { ServerObject } from "./model/ServerObject";
 
 
-export default class AppState {
-    servers:ServerObject[] = [];
+class AppState {
+    @observable servers:ServerObject[] = [];
 
-    constructor() {
+     constructor() {
         makeObservable(this, {
-        servers: observable,
+            servers: observable,
         });
     }
 
-    async getInstances() {
+    @action getInstances = async () => {
         let serverRepository:ServerRepository =  new ServerRepository();
         let results = await serverRepository.getServers();
-        this.servers.concat(results);
+        console.log("getInstance: " + results.length);
+        this.servers = results;
+        console.log("appState length of servers: " + this.servers.length);
     }
+
+    @action deleteServer = (instance:ServerObject) => {
+       const newServers = this.servers.filter(item=> item !== instance);
+       this.servers = newServers;
+       console.log("server length: " + this.servers.length);
+    };
 }
 
 const appState = new AppState();
+
+export default appState;
