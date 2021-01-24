@@ -15,9 +15,12 @@ import (
 )
 
 var clientset *kubernetes.Clientset
+var defaultNamespace string
 
 //Init Initialize k8s client configurations
 func Init(ctx context.Context, c *config.Configs) {
+	defaultNamespace = c.Kubernetes.Namespace
+
 	config, err := rest.InClusterConfig()
 	if err == nil {
 		log.Info().Msg("parsed incluster kubeconfig")

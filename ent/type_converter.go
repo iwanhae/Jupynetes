@@ -11,6 +11,9 @@ func (v *Template) ToCommonType() *common.Template {
 		Body:        v.Template,
 		Variables:   common.TemplateVariables{},
 	}
+	if v.Variables == nil {
+		return res
+	}
 	for _, variable := range *v.Variables {
 		res.Variables = append(res.Variables,
 			common.TemplateVariable{

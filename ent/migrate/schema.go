@@ -56,7 +56,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "description", Type: field.TypeString, Nullable: true},
-		{Name: "template", Type: field.TypeString},
+		{Name: "template", Type: field.TypeString, SchemaType: map[string]string{"mysql": "longtext"}},
 		{Name: "variables", Type: field.TypeJSON},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},

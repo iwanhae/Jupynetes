@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/facebook/ent"
+	"github.com/facebook/ent/dialect"
 	"github.com/facebook/ent/schema/edge"
 	"github.com/facebook/ent/schema/field"
 	"github.com/iwanhae/Jupynetes/pkg/common"
@@ -19,7 +20,9 @@ func (Template) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").Unique(),
 		field.String("description").Optional(),
-		field.String("template"),
+		field.String("template").SchemaType(map[string]string{
+			dialect.MySQL: "longtext",
+		}),
 		field.JSON("variables", &common.TemplateVariables{}),
 		field.Time("created_at").Default(time.Now),
 		field.Time("deleted_at").Optional(),

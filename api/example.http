@@ -1,0 +1,51 @@
+POST httP://127.0.0.1:3000/v1/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "id": "admin",
+    "pw": "admin"
+}
+###
+POST http://127.0.0.1:3000/v1/admin/template HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "default",
+    "description": "test",
+    "body": "\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: dev-coder\n  namespace: apps\nspec:\n  selector:\n    matchLabels:\n      app: dev-coder\n  template:\n    metadata:\n      labels:\n        app: dev-coder\n    spec:\n      hostname: dev\n      containers:\n        - name: dev-coder\n          image: idock.iwanhae.kr/code-server:go\n          ports:\n            - containerPort: 8080\n",
+    "template_variables": [{
+        "name": "good",
+        "value": "world"
+    }]
+}
+###
+POST http://127.0.0.1:3000/v1/admin/template HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "limit",
+    "description": "test",
+    "body": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: dev-coder\n  namespace: apps\nspec:\n  selector:\n    matchLabels:\n      app: dev-coder\n  template:\n    metadata:\n      labels:\n        app: dev-coder\n    spec:\n      serviceAccountName: jupynetes\n      hostname: dev\n      containers:\n        - name: dev-coder\n          image: idock.iwanhae.kr/code-server:go\n          resources:\n            limits:\n              memory: \"2048Mi\"\n          ports:\n            - containerPort: 8080",
+    "template_variables": [{
+        "name": "good",
+        "value": "world"
+    }]
+}
+
+###
+POST http://127.0.0.1:3000/v1/server HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "test",
+    "description": "test",
+    "template_id": 1,
+    "template_variables": [{
+        "name": "good",
+        "value": "world"
+    }],
+    "flavor": {
+        "cpu": 500,
+        "memory": 1024
+    }
+}
