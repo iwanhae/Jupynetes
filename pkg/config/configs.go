@@ -1,6 +1,9 @@
 package config
 
 import (
+	"log"
+	"os"
+
 	"github.com/spf13/viper"
 )
 
@@ -53,7 +56,18 @@ func GetConfigs() *Configs {
 	config := Configs{}
 
 	v := viper.New()
-	v.AutomaticEnv()
+
+	if _, err := os.Stat(".env"); os.IsNotExist(err) {
+		v.AutomaticEnv()
+	} else {
+		v.SetConfigType("dotenv")
+		v.SetConfigFile(".env")
+		err := v.ReadInConfig()
+		if err != nil {
+			log.Fatalf("fail to read dotenv file:%s", err.Error())
+		}
+	}
+
 	v.SetDefault(EnvDeploy, EnvDeployDebug)
 	v.SetDefault(EnvSecretKey, "e190ufqe2")
 	v.SetDefault(EnvKubernetesNamespace, "jupy")
