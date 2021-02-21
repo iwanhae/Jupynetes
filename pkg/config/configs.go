@@ -20,6 +20,8 @@ const (
 	EnvQuotaMemory                           = "quota_memory"
 	EnvQuotaNvidiaGpu                        = "quota_nvidia_gpu"
 	EnvQuotaStorage                          = "quota_storage"
+	EnvDomainUpper                           = "domain_upper"
+	EnvDomainPrefix                          = "domain_prefix"
 )
 
 //Possible parameters
@@ -48,6 +50,10 @@ type Configs struct {
 		Memory    int
 		NvidiaGpu int
 		Storage   int
+	}
+	Domain struct {
+		Upper  string // csuos.ml
+		Prefix string // if prefix is "jupy", ingress will be generated likes jupy-servername.csuos.ml
 	}
 }
 
@@ -80,6 +86,9 @@ func GetConfigs() *Configs {
 	v.SetDefault(EnvQuotaNvidiaGpu, -1)
 	v.SetDefault(EnvQuotaStorage, -1)
 
+	v.SetDefault(EnvDomainUpper, "")
+	v.SetDefault(EnvDomainPrefix, "")
+
 	//
 	config.Deploy = v.GetString(EnvDeploy)
 	config.SecretKey = v.GetString(EnvSecretKey)
@@ -94,6 +103,9 @@ func GetConfigs() *Configs {
 	config.Quota.Memory = v.GetInt(EnvQuotaMemory)
 	config.Quota.NvidiaGpu = v.GetInt(EnvQuotaNvidiaGpu)
 	config.Quota.Storage = v.GetInt(EnvQuotaStorage)
+
+	config.Domain.Upper = v.GetString(EnvDomainUpper)
+	config.Domain.Prefix = v.GetString(EnvDomainPrefix)
 
 	return &config
 }

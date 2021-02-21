@@ -40,6 +40,10 @@ func DeployServer(ctx context.Context, name string, template *common.Template) e
 
 func deplyIngress(ctx context.Context, name string, template *common.Template) error {
 	clientset.NetworkingV1beta1().Ingresses(defaultNamespace).Delete(ctx, name, metav1.DeleteOptions{})
+	domain := fmt.Sprintf("%s-%s.%s", domainPrefix, name, domainUpper)
+	if domainPrefix == "" {
+		domain = fmt.Sprintf("%s.%s", name, domainUpper)
+	}
 	_, err := clientset.NetworkingV1beta1().Ingresses(defaultNamespace).Create(ctx,
 		&networkingv1beta1.Ingress{
 			TypeMeta: metav1.TypeMeta{
@@ -53,7 +57,7 @@ func deplyIngress(ctx context.Context, name string, template *common.Template) e
 			Spec: networkingv1beta1.IngressSpec{
 				Rules: []networkingv1beta1.IngressRule{
 					{
-						Host: fmt.Sprintf("%s-jupynetes.iwanhae.kr", name),
+						Host: domain,
 						IngressRuleValue: networkingv1beta1.IngressRuleValue{
 							HTTP: &networkingv1beta1.HTTPIngressRuleValue{
 								Paths: []networkingv1beta1.HTTPIngressPath{

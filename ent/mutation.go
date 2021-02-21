@@ -580,6 +580,9 @@ type ServerMutation struct {
 	owners               map[int]struct{}
 	removedowners        map[int]struct{}
 	clearedowners        bool
+	event                map[int]struct{}
+	removedevent         map[int]struct{}
+	clearedevent         bool
 	template_from        map[int]struct{}
 	removedtemplate_from map[int]struct{}
 	clearedtemplate_from bool
@@ -1163,6 +1166,59 @@ func (m *ServerMutation) ResetOwners() {
 	m.removedowners = nil
 }
 
+// AddEventIDs adds the event edge to Event by ids.
+func (m *ServerMutation) AddEventIDs(ids ...int) {
+	if m.event == nil {
+		m.event = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.event[ids[i]] = struct{}{}
+	}
+}
+
+// ClearEvent clears the event edge to Event.
+func (m *ServerMutation) ClearEvent() {
+	m.clearedevent = true
+}
+
+// EventCleared returns if the edge event was cleared.
+func (m *ServerMutation) EventCleared() bool {
+	return m.clearedevent
+}
+
+// RemoveEventIDs removes the event edge to Event by ids.
+func (m *ServerMutation) RemoveEventIDs(ids ...int) {
+	if m.removedevent == nil {
+		m.removedevent = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedevent[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEvent returns the removed ids of event.
+func (m *ServerMutation) RemovedEventIDs() (ids []int) {
+	for id := range m.removedevent {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// EventIDs returns the event ids in the mutation.
+func (m *ServerMutation) EventIDs() (ids []int) {
+	for id := range m.event {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetEvent reset all changes of the "event" edge.
+func (m *ServerMutation) ResetEvent() {
+	m.event = nil
+	m.clearedevent = false
+	m.removedevent = nil
+}
+
 // AddTemplateFromIDs adds the template_from edge to Template by ids.
 func (m *ServerMutation) AddTemplateFromIDs(ids ...int) {
 	if m.template_from == nil {
@@ -1532,9 +1588,12 @@ func (m *ServerMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this
 // mutation.
 func (m *ServerMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.owners != nil {
 		edges = append(edges, server.EdgeOwners)
+	}
+	if m.event != nil {
+		edges = append(edges, server.EdgeEvent)
 	}
 	if m.template_from != nil {
 		edges = append(edges, server.EdgeTemplateFrom)
@@ -1552,6 +1611,12 @@ func (m *ServerMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case server.EdgeEvent:
+		ids := make([]ent.Value, 0, len(m.event))
+		for id := range m.event {
+			ids = append(ids, id)
+		}
+		return ids
 	case server.EdgeTemplateFrom:
 		ids := make([]ent.Value, 0, len(m.template_from))
 		for id := range m.template_from {
@@ -1565,9 +1630,12 @@ func (m *ServerMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this
 // mutation.
 func (m *ServerMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedowners != nil {
 		edges = append(edges, server.EdgeOwners)
+	}
+	if m.removedevent != nil {
+		edges = append(edges, server.EdgeEvent)
 	}
 	if m.removedtemplate_from != nil {
 		edges = append(edges, server.EdgeTemplateFrom)
@@ -1585,6 +1653,12 @@ func (m *ServerMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case server.EdgeEvent:
+		ids := make([]ent.Value, 0, len(m.removedevent))
+		for id := range m.removedevent {
+			ids = append(ids, id)
+		}
+		return ids
 	case server.EdgeTemplateFrom:
 		ids := make([]ent.Value, 0, len(m.removedtemplate_from))
 		for id := range m.removedtemplate_from {
@@ -1598,9 +1672,12 @@ func (m *ServerMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this
 // mutation.
 func (m *ServerMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedowners {
 		edges = append(edges, server.EdgeOwners)
+	}
+	if m.clearedevent {
+		edges = append(edges, server.EdgeEvent)
 	}
 	if m.clearedtemplate_from {
 		edges = append(edges, server.EdgeTemplateFrom)
@@ -1614,6 +1691,8 @@ func (m *ServerMutation) EdgeCleared(name string) bool {
 	switch name {
 	case server.EdgeOwners:
 		return m.clearedowners
+	case server.EdgeEvent:
+		return m.clearedevent
 	case server.EdgeTemplateFrom:
 		return m.clearedtemplate_from
 	}
@@ -1635,6 +1714,9 @@ func (m *ServerMutation) ResetEdge(name string) error {
 	switch name {
 	case server.EdgeOwners:
 		m.ResetOwners()
+		return nil
+	case server.EdgeEvent:
+		m.ResetEvent()
 		return nil
 	case server.EdgeTemplateFrom:
 		m.ResetTemplateFrom()

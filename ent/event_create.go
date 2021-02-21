@@ -28,14 +28,6 @@ func (ec *EventCreate) SetMessage(s string) *EventCreate {
 	return ec
 }
 
-// SetNillableMessage sets the message field if the given value is not nil.
-func (ec *EventCreate) SetNillableMessage(s *string) *EventCreate {
-	if s != nil {
-		ec.SetMessage(*s)
-	}
-	return ec
-}
-
 // SetCreatedAt sets the created_at field.
 func (ec *EventCreate) SetCreatedAt(t time.Time) *EventCreate {
 	ec.mutation.SetCreatedAt(t)
@@ -132,10 +124,6 @@ func (ec *EventCreate) SaveX(ctx context.Context) *Event {
 
 // defaults sets the default values of the builder before save.
 func (ec *EventCreate) defaults() {
-	if _, ok := ec.mutation.Message(); !ok {
-		v := event.DefaultMessage
-		ec.mutation.SetMessage(v)
-	}
 	if _, ok := ec.mutation.CreatedAt(); !ok {
 		v := event.DefaultCreatedAt()
 		ec.mutation.SetCreatedAt(v)
@@ -214,10 +202,10 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 	}
 	if nodes := ec.mutation.ServerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.ServerTable,
-			Columns: []string{event.ServerColumn},
+			Columns: event.ServerPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

@@ -34,6 +34,8 @@ const (
 
 	// EdgeOwners holds the string denoting the owners edge name in mutations.
 	EdgeOwners = "owners"
+	// EdgeEvent holds the string denoting the event edge name in mutations.
+	EdgeEvent = "event"
 	// EdgeTemplateFrom holds the string denoting the template_from edge name in mutations.
 	EdgeTemplateFrom = "template_from"
 
@@ -44,6 +46,11 @@ const (
 	// OwnersInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	OwnersInverseTable = "users"
+	// EventTable is the table the holds the event relation/edge. The primary key declared below.
+	EventTable = "event_server"
+	// EventInverseTable is the table name for the Event entity.
+	// It exists in this package in order to avoid circular dependency with the "event" package.
+	EventInverseTable = "events"
 	// TemplateFromTable is the table the holds the template_from relation/edge. The primary key declared below.
 	TemplateFromTable = "server_template_from"
 	// TemplateFromInverseTable is the table name for the Template entity.
@@ -66,15 +73,13 @@ var Columns = []string{
 	FieldDeletedAt,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the Server type.
-var ForeignKeys = []string{
-	"event_server",
-}
-
 var (
 	// OwnersPrimaryKey and OwnersColumn2 are the table columns denoting the
 	// primary key for the owners relation (M2M).
 	OwnersPrimaryKey = []string{"user_id", "server_id"}
+	// EventPrimaryKey and EventColumn2 are the table columns denoting the
+	// primary key for the event relation (M2M).
+	EventPrimaryKey = []string{"event_id", "server_id"}
 	// TemplateFromPrimaryKey and TemplateFromColumn2 are the table columns denoting the
 	// primary key for the template_from relation (M2M).
 	TemplateFromPrimaryKey = []string{"server_id", "template_id"}
@@ -84,11 +89,6 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}

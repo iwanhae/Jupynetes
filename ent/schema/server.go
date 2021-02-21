@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/facebook/ent"
+	"github.com/facebook/ent/dialect"
 	"github.com/facebook/ent/schema/edge"
 	"github.com/facebook/ent/schema/field"
 	"github.com/iwanhae/Jupynetes/pkg/common"
@@ -18,7 +19,9 @@ type Server struct {
 func (Server) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
-		field.String("template"),
+		field.String("template").SchemaType(map[string]string{
+			dialect.MySQL: "longtext",
+		}),
 		field.JSON("variables", &common.TemplateVariables{}),
 		field.String("ip"),
 		field.String("description"),
@@ -34,6 +37,7 @@ func (Server) Fields() []ent.Field {
 func (Server) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("owners", User.Type).Ref("servers"),
+		edge.From("event", Event.Type).Ref("server"),
 
 		edge.To("template_from", Template.Type),
 	}

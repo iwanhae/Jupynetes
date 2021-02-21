@@ -245,7 +245,7 @@ func (c *EventClient) QueryServer(e *Event) *ServerQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(event.Table, event.FieldID, id),
 			sqlgraph.To(server.Table, server.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, event.ServerTable, event.ServerColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, event.ServerTable, event.ServerPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -350,6 +350,22 @@ func (c *ServerClient) QueryOwners(s *Server) *UserQuery {
 			sqlgraph.From(server.Table, server.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, server.OwnersTable, server.OwnersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEvent queries the event edge of a Server.
+func (c *ServerClient) QueryEvent(s *Server) *EventQuery {
+	query := &EventQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(server.Table, server.FieldID, id),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, server.EventTable, server.EventPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil

@@ -328,7 +328,7 @@ func HasServer() predicate.Event {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ServerTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ServerTable, ServerColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, ServerTable, ServerPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -340,7 +340,7 @@ func HasServerWith(preds ...predicate.Server) predicate.Event {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ServerInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ServerTable, ServerColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, ServerTable, ServerPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

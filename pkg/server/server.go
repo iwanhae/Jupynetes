@@ -3,7 +3,9 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/iwanhae/Jupynetes/ent/server"
 	"github.com/iwanhae/Jupynetes/ent/template"
@@ -20,7 +22,45 @@ type Server struct{}
 
 // AdminSetQuota set user quota
 // (POST /admin/quota) and (POST /admin/quota/{userId})
-func (s *Server) AdminSetQuota(w http.ResponseWriter, r *http.Request) {}
+func (s *Server) AdminSetQuota(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	req := &common.Quota{}
+	if err := render.Bind(r, req); err != nil {
+		log.Ctx(ctx).Error().Err(err).Msg("invalid format")
+		send(w, http.StatusBadRequest, common.Reason{
+			Reason: "Invalid format",
+		})
+		return
+	}
+	db := database.GetClient()
+
+	userID := chi.URLParam(r, "userId")
+	if len(userID) == 0 {
+		send(w, http.StatusNotFound, common.GetReasonf("Set global quota is not supported by api"))
+		return
+	}
+	u, err := db.User.Query().Where(user.UserIDEQ(userID)).First(ctx)
+	if err != nil {
+		send(w, http.StatusNotFound, common.GetReasonf("user not found:%s", userID))
+		return
+	}
+
+	u, err = db.User.UpdateOneID(u.ID).
+		SetQuotaCPU(req.Cpu).
+		SetQuotaInstance(req.Instance).
+		SetQuotaMemory(req.Memory).
+		SetQuotaStorage(req.Storage).
+		SetQuotaNvidiaGpu(req.NvidiaGpu).
+		Save(ctx)
+
+	if err != nil {
+		send(w, http.StatusInternalServerError, common.GetReason(err.Error()))
+		return
+	}
+	send(w, http.StatusAccepted, req)
+	return
+}
 
 // AdminCreateTemplate create template
 // (POST /admin/template)
@@ -162,7 +202,29 @@ func (s *Server) LogoutUser(w http.ResponseWriter, r *http.Request) {
 
 // GetServerList Get list of accessible server to user
 // (GET /server)
-func (s *Server) GetServerList(w http.ResponseWriter, r *http.Request) {}
+func (s *Server) GetServerList(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userID := GetUser(ctx)
+	db := database.GetClient()
+	u, err := db.User.Query().Where(user.UserID(userID)).First(ctx)
+	if err != nil {
+		send(w, http.StatusForbidden, common.GetReasonf("unkown user error:%s", err.Error()))
+		return
+	}
+	servers, err := u.QueryServers().All(ctx)
+
+	res := []common.ServerObject{}
+	for _, s := range servers {
+		server, err := GetServerObject(ctx, s)
+		if err != nil {
+			send(w, http.StatusInternalServerError, common.GetReasonf("%s", err.Error()))
+			return
+		}
+		res = append(res, *server)
+	}
+	send(w, http.StatusOK, res)
+	return
+}
 
 // CreateServer Create server request
 // (POST /server)
@@ -175,6 +237,12 @@ func (s *Server) CreateServer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	db := database.GetClient()
+
+	user, err := db.User.Query().Where(user.UserIDEQ(GetUser(ctx))).First(ctx)
+	if err != nil {
+		send(w, http.StatusBadRequest, common.GetReason("user info not found"))
+		return
+	}
 
 	servers, err := db.Server.Query().Where(server.NameEQ(req.Name)).All(ctx)
 	if err != nil {
@@ -217,25 +285,117 @@ func (s *Server) CreateServer(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	err = kubeclient.DeployServer(ctx, req.Name, template)
+	created, err := db.Server.Create().
+		SetName(req.Name).
+		SetDescription(req.Description).
+		SetTemplate(template.Body).
+		SetIP("0.0.0.0").
+		SetVariables(&template.Variables).
+		SetCPU(req.Flavor.Cpu).
+		SetMemory(req.Flavor.Memory).
+		SetNvidiaGpu(req.Flavor.NvidiaGpu).
+		AddOwners(user).
+		AddTemplateFrom(templateEnt).
+		Save(ctx)
+
 	if err != nil {
-		send(w, http.StatusInternalServerError, common.GetReasonf("fail to create server:%s", err.Error()))
+		send(w, http.StatusInternalServerError, common.GetReasonf("fail to create server:fail to update db:%s", err.Error()))
 		return
 	}
 
-	// TODO
+	CreateEvent(ctx, fmt.Sprintf("creating server"), created, user)
 
-	send(w, http.StatusAccepted, nil)
+	err = kubeclient.DeployServer(ctx, req.Name, template)
+	if err != nil {
+		CreateEvent(ctx, fmt.Sprintf("fail to create server:%s", err.Error()), created, user)
+		send(w, http.StatusInternalServerError, common.GetReasonf("fail to create server:fail to apply to kubernetes:%s", err.Error()))
+		return
+	}
+	CreateEvent(ctx, fmt.Sprintf("request accepted"), created, user)
+
+	res, err := GetServerObject(ctx, created)
+	if err != nil {
+		send(w, http.StatusInternalServerError, common.GetReasonf("fail to get server info", err.Error()))
+		return
+	}
+
+	send(w, http.StatusAccepted, res)
 	return
 }
 
 // DeleteServer Delete server
 // (DELETE /server/{serverId}
-func (s *Server) DeleteServer(w http.ResponseWriter, r *http.Request) {}
+func (s *Server) DeleteServer(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	serverID, err := strconv.Atoi(chi.URLParam(r, "serverId"))
+	if err != nil {
+		send(w, http.StatusBadRequest, common.GetReason("can not parse server id"))
+		return
+	}
+
+	db := database.GetClient()
+	server, err := db.Server.Query().Where(server.ID(serverID)).First(ctx)
+	if err != nil || server == nil {
+		send(w, http.StatusNotFound, common.GetReasonf("server not found:%s", err.Error()))
+		return
+	}
+
+	tmpErr := kubeclient.DeleteServer(ctx, server.Name)
+
+	user, _ := db.User.Query().Where(user.UserID(GetUser(ctx))).First(ctx)
+	CreateEvent(ctx, "server deleted", server, user)
+
+	err = db.Server.DeleteOneID(server.ID).Exec(ctx)
+	if err != nil {
+		send(w, http.StatusInternalServerError, common.GetReasonf("fail to delete server:%s", err.Error()))
+		return
+	}
+	if tmpErr != nil {
+		send(w, http.StatusAccepted, common.GetReasonf("server deleted, but warnings:%s", tmpErr))
+		return
+	}
+	send(w, http.StatusAccepted, common.GetReasonf("server deleted"))
+	return
+}
 
 // GetServer Get server info
 // (GET /server/{serverId}
-func (s *Server) GetServer(w http.ResponseWriter, r *http.Request) {}
+func (s *Server) GetServer(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	serverID, err := strconv.Atoi(chi.URLParam(r, "serverId"))
+	if err != nil {
+		send(w, http.StatusBadRequest, common.GetReason("can not parse server id"))
+		return
+	}
+
+	db := database.GetClient()
+	server, err := db.Server.Query().Where(server.ID(serverID)).First(ctx)
+	if err != nil {
+		send(w, http.StatusNotFound, common.GetReasonf("fail to find server %q", serverID))
+		return
+	}
+
+	res, err := GetServerObject(ctx, server)
+	if err != nil {
+		send(w, http.StatusInternalServerError, common.GetReasonf("fail to get server %q", serverID))
+		return
+	}
+
+	userID := GetUser(ctx)
+	if userID == "admin" {
+		send(w, http.StatusOK, res)
+		return
+	}
+	for _, o := range res.Owner {
+		if o == userID {
+			send(w, http.StatusOK, res)
+			return
+		}
+	}
+	send(w, http.StatusUnauthorized, common.GetReason("you do not have a permission to access this server"))
+}
 
 // GetTemplateList get template list
 // (GET /template)

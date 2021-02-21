@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+const (
+	JwtAuthScopes = "jwtAuth.Scopes"
+)
+
 // CreateServerRequest defines model for CreateServerRequest.
 type CreateServerRequest struct {
 	Description string `json:"description"`
@@ -72,7 +76,7 @@ type ServerObject struct {
 	Flavor      Flavor `json:"flavor"`
 
 	// id of this server
-	Id string `json:"id"`
+	Id int `json:"id"`
 
 	// timestamp of last health check time
 	LastProbeTime time.Time `json:"last_probe_time"`
@@ -142,20 +146,20 @@ type UpdateUserInfoJSONBody struct {
 	Password    *string `json:"password,omitempty"`
 }
 
-// AdminSetGroupQuotaRequestBody defines body for AdminSetGroupQuota for application/json ContentType.
+// AdminSetGroupQuotaJSONRequestBody defines body for AdminSetGroupQuota for application/json ContentType.
 type AdminSetGroupQuotaJSONRequestBody AdminSetGroupQuotaJSONBody
 
-// AdminSetUserQuotaRequestBody defines body for AdminSetUserQuota for application/json ContentType.
+// AdminSetUserQuotaJSONRequestBody defines body for AdminSetUserQuota for application/json ContentType.
 type AdminSetUserQuotaJSONRequestBody AdminSetUserQuotaJSONBody
 
-// AdminCreateTemplateRequestBody defines body for AdminCreateTemplate for application/json ContentType.
+// AdminCreateTemplateJSONRequestBody defines body for AdminCreateTemplate for application/json ContentType.
 type AdminCreateTemplateJSONRequestBody AdminCreateTemplateJSONBody
 
-// LoginUserRequestBody defines body for LoginUser for application/json ContentType.
+// LoginUserJSONRequestBody defines body for LoginUser for application/json ContentType.
 type LoginUserJSONRequestBody LoginUserJSONBody
 
-// CreateServerRequestBody defines body for CreateServer for application/json ContentType.
+// CreateServerJSONRequestBody defines body for CreateServer for application/json ContentType.
 type CreateServerJSONRequestBody CreateServerJSONBody
 
-// UpdateUserInfoRequestBody defines body for UpdateUserInfo for application/json ContentType.
+// UpdateUserInfoJSONRequestBody defines body for UpdateUserInfo for application/json ContentType.
 type UpdateUserInfoJSONRequestBody UpdateUserInfoJSONBody

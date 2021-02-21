@@ -10,6 +10,7 @@ import (
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"
+	"github.com/iwanhae/Jupynetes/ent/event"
 	"github.com/iwanhae/Jupynetes/ent/predicate"
 	"github.com/iwanhae/Jupynetes/ent/server"
 	"github.com/iwanhae/Jupynetes/ent/template"
@@ -148,6 +149,21 @@ func (su *ServerUpdate) AddOwners(u ...*User) *ServerUpdate {
 	return su.AddOwnerIDs(ids...)
 }
 
+// AddEventIDs adds the event edge to Event by ids.
+func (su *ServerUpdate) AddEventIDs(ids ...int) *ServerUpdate {
+	su.mutation.AddEventIDs(ids...)
+	return su
+}
+
+// AddEvent adds the event edges to Event.
+func (su *ServerUpdate) AddEvent(e ...*Event) *ServerUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return su.AddEventIDs(ids...)
+}
+
 // AddTemplateFromIDs adds the template_from edge to Template by ids.
 func (su *ServerUpdate) AddTemplateFromIDs(ids ...int) *ServerUpdate {
 	su.mutation.AddTemplateFromIDs(ids...)
@@ -187,6 +203,27 @@ func (su *ServerUpdate) RemoveOwners(u ...*User) *ServerUpdate {
 		ids[i] = u[i].ID
 	}
 	return su.RemoveOwnerIDs(ids...)
+}
+
+// ClearEvent clears all "event" edges to type Event.
+func (su *ServerUpdate) ClearEvent() *ServerUpdate {
+	su.mutation.ClearEvent()
+	return su
+}
+
+// RemoveEventIDs removes the event edge to Event by ids.
+func (su *ServerUpdate) RemoveEventIDs(ids ...int) *ServerUpdate {
+	su.mutation.RemoveEventIDs(ids...)
+	return su
+}
+
+// RemoveEvent removes event edges to Event.
+func (su *ServerUpdate) RemoveEvent(e ...*Event) *ServerUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return su.RemoveEventIDs(ids...)
 }
 
 // ClearTemplateFrom clears all "template_from" edges to type Template.
@@ -430,6 +467,60 @@ func (su *ServerUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if su.mutation.EventCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   server.EventTable,
+			Columns: server.EventPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: event.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedEventIDs(); len(nodes) > 0 && !su.mutation.EventCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   server.EventTable,
+			Columns: server.EventPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: event.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.EventIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   server.EventTable,
+			Columns: server.EventPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: event.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if su.mutation.TemplateFromCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -620,6 +711,21 @@ func (suo *ServerUpdateOne) AddOwners(u ...*User) *ServerUpdateOne {
 	return suo.AddOwnerIDs(ids...)
 }
 
+// AddEventIDs adds the event edge to Event by ids.
+func (suo *ServerUpdateOne) AddEventIDs(ids ...int) *ServerUpdateOne {
+	suo.mutation.AddEventIDs(ids...)
+	return suo
+}
+
+// AddEvent adds the event edges to Event.
+func (suo *ServerUpdateOne) AddEvent(e ...*Event) *ServerUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return suo.AddEventIDs(ids...)
+}
+
 // AddTemplateFromIDs adds the template_from edge to Template by ids.
 func (suo *ServerUpdateOne) AddTemplateFromIDs(ids ...int) *ServerUpdateOne {
 	suo.mutation.AddTemplateFromIDs(ids...)
@@ -659,6 +765,27 @@ func (suo *ServerUpdateOne) RemoveOwners(u ...*User) *ServerUpdateOne {
 		ids[i] = u[i].ID
 	}
 	return suo.RemoveOwnerIDs(ids...)
+}
+
+// ClearEvent clears all "event" edges to type Event.
+func (suo *ServerUpdateOne) ClearEvent() *ServerUpdateOne {
+	suo.mutation.ClearEvent()
+	return suo
+}
+
+// RemoveEventIDs removes the event edge to Event by ids.
+func (suo *ServerUpdateOne) RemoveEventIDs(ids ...int) *ServerUpdateOne {
+	suo.mutation.RemoveEventIDs(ids...)
+	return suo
+}
+
+// RemoveEvent removes event edges to Event.
+func (suo *ServerUpdateOne) RemoveEvent(e ...*Event) *ServerUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return suo.RemoveEventIDs(ids...)
 }
 
 // ClearTemplateFrom clears all "template_from" edges to type Template.
@@ -892,6 +1019,60 @@ func (suo *ServerUpdateOne) sqlSave(ctx context.Context) (_node *Server, err err
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.EventCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   server.EventTable,
+			Columns: server.EventPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: event.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedEventIDs(); len(nodes) > 0 && !suo.mutation.EventCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   server.EventTable,
+			Columns: server.EventPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: event.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.EventIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   server.EventTable,
+			Columns: server.EventPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: event.FieldID,
 				},
 			},
 		}

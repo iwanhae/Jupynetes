@@ -18,10 +18,6 @@ import (
 func init() {
 	eventFields := schema.Event{}.Fields()
 	_ = eventFields
-	// eventDescMessage is the schema descriptor for message field.
-	eventDescMessage := eventFields[0].Descriptor()
-	// event.DefaultMessage holds the default value on creation for the message field.
-	event.DefaultMessage = eventDescMessage.Default.(string)
 	// eventDescCreatedAt is the schema descriptor for created_at field.
 	eventDescCreatedAt := eventFields[1].Descriptor()
 	// event.DefaultCreatedAt holds the default value on creation for the created_at field.

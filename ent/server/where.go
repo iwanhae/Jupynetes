@@ -1022,6 +1022,34 @@ func HasOwnersWith(preds ...predicate.User) predicate.Server {
 	})
 }
 
+// HasEvent applies the HasEdge predicate on the "event" edge.
+func HasEvent() predicate.Server {
+	return predicate.Server(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(EventTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, EventTable, EventPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEventWith applies the HasEdge predicate on the "event" edge with a given conditions (other predicates).
+func HasEventWith(preds ...predicate.Event) predicate.Server {
+	return predicate.Server(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(EventInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, EventTable, EventPrimaryKey...),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasTemplateFrom applies the HasEdge predicate on the "template_from" edge.
 func HasTemplateFrom() predicate.Server {
 	return predicate.Server(func(s *sql.Selector) {

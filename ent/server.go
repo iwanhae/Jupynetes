@@ -40,19 +40,20 @@ type Server struct {
 	DeletedAt time.Time `json:"deleted_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ServerQuery when eager-loading is set.
-	Edges        ServerEdges `json:"edges"`
-	event_server *int
+	Edges ServerEdges `json:"edges"`
 }
 
 // ServerEdges holds the relations/edges for other nodes in the graph.
 type ServerEdges struct {
 	// Owners holds the value of the owners edge.
 	Owners []*User
+	// Event holds the value of the event edge.
+	Event []*Event
 	// TemplateFrom holds the value of the template_from edge.
 	TemplateFrom []*Template
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // OwnersOrErr returns the Owners value or an error if the edge
@@ -64,10 +65,19 @@ func (e ServerEdges) OwnersOrErr() ([]*User, error) {
 	return nil, &NotLoadedError{edge: "owners"}
 }
 
+// EventOrErr returns the Event value or an error if the edge
+// was not loaded in eager-loading.
+func (e ServerEdges) EventOrErr() ([]*Event, error) {
+	if e.loadedTypes[1] {
+		return e.Event, nil
+	}
+	return nil, &NotLoadedError{edge: "event"}
+}
+
 // TemplateFromOrErr returns the TemplateFrom value or an error if the edge
 // was not loaded in eager-loading.
 func (e ServerEdges) TemplateFromOrErr() ([]*Template, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.TemplateFrom, nil
 	}
 	return nil, &NotLoadedError{edge: "template_from"}
@@ -87,13 +97,6 @@ func (*Server) scanValues() []interface{} {
 		&sql.NullInt64{},  // nvidia_gpu
 		&sql.NullTime{},   // created_at
 		&sql.NullTime{},   // deleted_at
-	}
-}
-
-// fkValues returns the types for scanning foreign-keys values from sql.Rows.
-func (*Server) fkValues() []interface{} {
-	return []interface{}{
-		&sql.NullInt64{}, // event_server
 	}
 }
 
@@ -162,21 +165,17 @@ func (s *Server) assignValues(values ...interface{}) error {
 	} else if value.Valid {
 		s.DeletedAt = value.Time
 	}
-	values = values[10:]
-	if len(values) == len(server.ForeignKeys) {
-		if value, ok := values[0].(*sql.NullInt64); !ok {
-			return fmt.Errorf("unexpected type %T for edge-field event_server", value)
-		} else if value.Valid {
-			s.event_server = new(int)
-			*s.event_server = int(value.Int64)
-		}
-	}
 	return nil
 }
 
 // QueryOwners queries the owners edge of the Server.
 func (s *Server) QueryOwners() *UserQuery {
 	return (&ServerClient{config: s.config}).QueryOwners(s)
+}
+
+// QueryEvent queries the event edge of the Server.
+func (s *Server) QueryEvent() *EventQuery {
+	return (&ServerClient{config: s.config}).QueryEvent(s)
 }
 
 // QueryTemplateFrom queries the template_from edge of the Server.

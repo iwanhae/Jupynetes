@@ -10,6 +10,7 @@ import (
 
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"
+	"github.com/iwanhae/Jupynetes/ent/event"
 	"github.com/iwanhae/Jupynetes/ent/server"
 	"github.com/iwanhae/Jupynetes/ent/template"
 	"github.com/iwanhae/Jupynetes/ent/user"
@@ -112,6 +113,21 @@ func (sc *ServerCreate) AddOwners(u ...*User) *ServerCreate {
 		ids[i] = u[i].ID
 	}
 	return sc.AddOwnerIDs(ids...)
+}
+
+// AddEventIDs adds the event edge to Event by ids.
+func (sc *ServerCreate) AddEventIDs(ids ...int) *ServerCreate {
+	sc.mutation.AddEventIDs(ids...)
+	return sc
+}
+
+// AddEvent adds the event edges to Event.
+func (sc *ServerCreate) AddEvent(e ...*Event) *ServerCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return sc.AddEventIDs(ids...)
 }
 
 // AddTemplateFromIDs adds the template_from edge to Template by ids.
@@ -334,6 +350,25 @@ func (sc *ServerCreate) createSpec() (*Server, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: user.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.EventIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   server.EventTable,
+			Columns: server.EventPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: event.FieldID,
 				},
 			},
 		}

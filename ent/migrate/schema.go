@@ -11,7 +11,7 @@ var (
 	// EventsColumns holds the columns for the "events" table.
 	EventsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "message", Type: field.TypeString, Default: ""},
+		{Name: "message", Type: field.TypeString, SchemaType: map[string]string{"mysql": "longtext"}},
 		{Name: "created_at", Type: field.TypeTime},
 	}
 	// EventsTable holds the schema information for the "events" table.
@@ -25,7 +25,7 @@ var (
 	ServersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "template", Type: field.TypeString},
+		{Name: "template", Type: field.TypeString, SchemaType: map[string]string{"mysql": "longtext"}},
 		{Name: "variables", Type: field.TypeJSON},
 		{Name: "ip", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString},
@@ -34,22 +34,13 @@ var (
 		{Name: "nvidia_gpu", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "event_server", Type: field.TypeInt, Nullable: true},
 	}
 	// ServersTable holds the schema information for the "servers" table.
 	ServersTable = &schema.Table{
-		Name:       "servers",
-		Columns:    ServersColumns,
-		PrimaryKey: []*schema.Column{ServersColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:  "servers_events_server",
-				Columns: []*schema.Column{ServersColumns[11]},
-
-				RefColumns: []*schema.Column{EventsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
+		Name:        "servers",
+		Columns:     ServersColumns,
+		PrimaryKey:  []*schema.Column{ServersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
 	}
 	// TemplatesColumns holds the columns for the "templates" table.
 	TemplatesColumns = []*schema.Column{
@@ -111,6 +102,33 @@ var (
 				Columns: []*schema.Column{EventUserColumns[1]},
 
 				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// EventServerColumns holds the columns for the "event_server" table.
+	EventServerColumns = []*schema.Column{
+		{Name: "event_id", Type: field.TypeInt},
+		{Name: "server_id", Type: field.TypeInt},
+	}
+	// EventServerTable holds the schema information for the "event_server" table.
+	EventServerTable = &schema.Table{
+		Name:       "event_server",
+		Columns:    EventServerColumns,
+		PrimaryKey: []*schema.Column{EventServerColumns[0], EventServerColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "event_server_event_id",
+				Columns: []*schema.Column{EventServerColumns[0]},
+
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:  "event_server_server_id",
+				Columns: []*schema.Column{EventServerColumns[1]},
+
+				RefColumns: []*schema.Column{ServersColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -203,6 +221,7 @@ var (
 		TemplatesTable,
 		UsersTable,
 		EventUserTable,
+		EventServerTable,
 		ServerTemplateFromTable,
 		UserServersTable,
 		UserTemplatesTable,
@@ -210,9 +229,10 @@ var (
 )
 
 func init() {
-	ServersTable.ForeignKeys[0].RefTable = EventsTable
 	EventUserTable.ForeignKeys[0].RefTable = EventsTable
 	EventUserTable.ForeignKeys[1].RefTable = UsersTable
+	EventServerTable.ForeignKeys[0].RefTable = EventsTable
+	EventServerTable.ForeignKeys[1].RefTable = ServersTable
 	ServerTemplateFromTable.ForeignKeys[0].RefTable = ServersTable
 	ServerTemplateFromTable.ForeignKeys[1].RefTable = TemplatesTable
 	UserServersTable.ForeignKeys[0].RefTable = UsersTable

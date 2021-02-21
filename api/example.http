@@ -37,7 +37,7 @@ POST http://127.0.0.1:3000/v1/server HTTP/1.1
 Content-Type: application/json
 
 {
-    "name": "test",
+    "name": "test2",
     "description": "test",
     "template_id": 1,
     "template_variables": [{
@@ -49,3 +49,7 @@ Content-Type: application/json
         "memory": 1024
     }
 }
+###
+GET http://127.0.0.1:3000/v1/server HTTP/1.1
+###
+DELETE  http://127.0.0.1:3000/v1/server/13 HTTP/1.1

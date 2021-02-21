@@ -35,14 +35,6 @@ func (eu *EventUpdate) SetMessage(s string) *EventUpdate {
 	return eu
 }
 
-// SetNillableMessage sets the message field if the given value is not nil.
-func (eu *EventUpdate) SetNillableMessage(s *string) *EventUpdate {
-	if s != nil {
-		eu.SetMessage(*s)
-	}
-	return eu
-}
-
 // SetCreatedAt sets the created_at field.
 func (eu *EventUpdate) SetCreatedAt(t time.Time) *EventUpdate {
 	eu.mutation.SetCreatedAt(t)
@@ -273,10 +265,10 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if eu.mutation.ServerCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.ServerTable,
-			Columns: []string{event.ServerColumn},
+			Columns: event.ServerPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -289,10 +281,10 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := eu.mutation.RemovedServerIDs(); len(nodes) > 0 && !eu.mutation.ServerCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.ServerTable,
-			Columns: []string{event.ServerColumn},
+			Columns: event.ServerPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -308,10 +300,10 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := eu.mutation.ServerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.ServerTable,
-			Columns: []string{event.ServerColumn},
+			Columns: event.ServerPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -346,14 +338,6 @@ type EventUpdateOne struct {
 // SetMessage sets the message field.
 func (euo *EventUpdateOne) SetMessage(s string) *EventUpdateOne {
 	euo.mutation.SetMessage(s)
-	return euo
-}
-
-// SetNillableMessage sets the message field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableMessage(s *string) *EventUpdateOne {
-	if s != nil {
-		euo.SetMessage(*s)
-	}
 	return euo
 }
 
@@ -585,10 +569,10 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 	}
 	if euo.mutation.ServerCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.ServerTable,
-			Columns: []string{event.ServerColumn},
+			Columns: event.ServerPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -601,10 +585,10 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 	}
 	if nodes := euo.mutation.RemovedServerIDs(); len(nodes) > 0 && !euo.mutation.ServerCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.ServerTable,
-			Columns: []string{event.ServerColumn},
+			Columns: event.ServerPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -620,10 +604,10 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 	}
 	if nodes := euo.mutation.ServerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   event.ServerTable,
-			Columns: []string{event.ServerColumn},
+			Columns: event.ServerPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

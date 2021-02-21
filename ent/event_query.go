@@ -93,7 +93,7 @@ func (eq *EventQuery) QueryServer() *ServerQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(event.Table, event.FieldID, selector),
 			sqlgraph.To(server.Table, server.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, event.ServerTable, event.ServerColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, event.ServerTable, event.ServerPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -464,30 +464,65 @@ func (eq *EventQuery) sqlAll(ctx context.Context) ([]*Event, error) {
 
 	if query := eq.withServer; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[int]*Event)
-		for i := range nodes {
-			fks = append(fks, nodes[i].ID)
-			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.Server = []*Server{}
+		ids := make(map[int]*Event, len(nodes))
+		for _, node := range nodes {
+			ids[node.ID] = node
+			fks = append(fks, node.ID)
+			node.Edges.Server = []*Server{}
 		}
-		query.withFKs = true
-		query.Where(predicate.Server(func(s *sql.Selector) {
-			s.Where(sql.InValues(event.ServerColumn, fks...))
-		}))
+		var (
+			edgeids []int
+			edges   = make(map[int][]*Event)
+		)
+		_spec := &sqlgraph.EdgeQuerySpec{
+			Edge: &sqlgraph.EdgeSpec{
+				Inverse: false,
+				Table:   event.ServerTable,
+				Columns: event.ServerPrimaryKey,
+			},
+			Predicate: func(s *sql.Selector) {
+				s.Where(sql.InValues(event.ServerPrimaryKey[0], fks...))
+			},
+
+			ScanValues: func() [2]interface{} {
+				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
+			},
+			Assign: func(out, in interface{}) error {
+				eout, ok := out.(*sql.NullInt64)
+				if !ok || eout == nil {
+					return fmt.Errorf("unexpected id value for edge-out")
+				}
+				ein, ok := in.(*sql.NullInt64)
+				if !ok || ein == nil {
+					return fmt.Errorf("unexpected id value for edge-in")
+				}
+				outValue := int(eout.Int64)
+				inValue := int(ein.Int64)
+				node, ok := ids[outValue]
+				if !ok {
+					return fmt.Errorf("unexpected node id in edges: %v", outValue)
+				}
+				edgeids = append(edgeids, inValue)
+				edges[inValue] = append(edges[inValue], node)
+				return nil
+			},
+		}
+		if err := sqlgraph.QueryEdges(ctx, eq.driver, _spec); err != nil {
+			return nil, fmt.Errorf(`query edges "server": %v`, err)
+		}
+		query.Where(server.IDIn(edgeids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.event_server
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "event_server" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
+			nodes, ok := edges[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "event_server" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected "server" node returned %v`, n.ID)
 			}
-			node.Edges.Server = append(node.Edges.Server, n)
+			for i := range nodes {
+				nodes[i].Edges.Server = append(nodes[i].Edges.Server, n)
+			}
 		}
 	}
 

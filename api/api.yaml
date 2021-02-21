@@ -394,7 +394,7 @@ components:
         - owner
       properties:
         id:
-          type: string
+          type: integer
           description: "id of this server"
         name:
           type: string
@@ -457,6 +457,7 @@ components:
     Template:
       type: object
       required:
+        - id
         - name
         - description
         - body

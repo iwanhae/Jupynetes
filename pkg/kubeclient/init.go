@@ -17,9 +17,15 @@ import (
 var clientset *kubernetes.Clientset
 var defaultNamespace string
 
+var domainUpper string
+var domainPrefix string
+
 //Init Initialize k8s client configurations
 func Init(ctx context.Context, c *config.Configs) {
 	defaultNamespace = c.Kubernetes.Namespace
+
+	domainUpper = c.Domain.Upper
+	domainPrefix = c.Domain.Prefix
 
 	config, err := rest.InClusterConfig()
 	if err == nil {

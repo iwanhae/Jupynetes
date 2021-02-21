@@ -12,6 +12,7 @@ import (
 	"github.com/facebook/ent/dialect/sql"
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"
+	"github.com/iwanhae/Jupynetes/ent/event"
 	"github.com/iwanhae/Jupynetes/ent/predicate"
 	"github.com/iwanhae/Jupynetes/ent/server"
 	"github.com/iwanhae/Jupynetes/ent/template"
@@ -27,8 +28,8 @@ type ServerQuery struct {
 	predicates []predicate.Server
 	// eager-loading edges.
 	withOwners       *UserQuery
+	withEvent        *EventQuery
 	withTemplateFrom *TemplateQuery
-	withFKs          bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -73,6 +74,28 @@ func (sq *ServerQuery) QueryOwners() *UserQuery {
 			sqlgraph.From(server.Table, server.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, server.OwnersTable, server.OwnersPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryEvent chains the current query on the event edge.
+func (sq *ServerQuery) QueryEvent() *EventQuery {
+	query := &EventQuery{config: sq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery()
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(server.Table, server.FieldID, selector),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, server.EventTable, server.EventPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -278,6 +301,7 @@ func (sq *ServerQuery) Clone() *ServerQuery {
 		order:            append([]OrderFunc{}, sq.order...),
 		predicates:       append([]predicate.Server{}, sq.predicates...),
 		withOwners:       sq.withOwners.Clone(),
+		withEvent:        sq.withEvent.Clone(),
 		withTemplateFrom: sq.withTemplateFrom.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
@@ -293,6 +317,17 @@ func (sq *ServerQuery) WithOwners(opts ...func(*UserQuery)) *ServerQuery {
 		opt(query)
 	}
 	sq.withOwners = query
+	return sq
+}
+
+//  WithEvent tells the query-builder to eager-loads the nodes that are connected to
+// the "event" edge. The optional arguments used to configure the query builder of the edge.
+func (sq *ServerQuery) WithEvent(opts ...func(*EventQuery)) *ServerQuery {
+	query := &EventQuery{config: sq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withEvent = query
 	return sq
 }
 
@@ -372,23 +407,17 @@ func (sq *ServerQuery) prepareQuery(ctx context.Context) error {
 func (sq *ServerQuery) sqlAll(ctx context.Context) ([]*Server, error) {
 	var (
 		nodes       = []*Server{}
-		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			sq.withOwners != nil,
+			sq.withEvent != nil,
 			sq.withTemplateFrom != nil,
 		}
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, server.ForeignKeys...)
-	}
 	_spec.ScanValues = func() []interface{} {
 		node := &Server{config: sq.config}
 		nodes = append(nodes, node)
 		values := node.scanValues()
-		if withFKs {
-			values = append(values, node.fkValues()...)
-		}
 		return values
 	}
 	_spec.Assign = func(values ...interface{}) error {
@@ -466,6 +495,70 @@ func (sq *ServerQuery) sqlAll(ctx context.Context) ([]*Server, error) {
 			}
 			for i := range nodes {
 				nodes[i].Edges.Owners = append(nodes[i].Edges.Owners, n)
+			}
+		}
+	}
+
+	if query := sq.withEvent; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		ids := make(map[int]*Server, len(nodes))
+		for _, node := range nodes {
+			ids[node.ID] = node
+			fks = append(fks, node.ID)
+			node.Edges.Event = []*Event{}
+		}
+		var (
+			edgeids []int
+			edges   = make(map[int][]*Server)
+		)
+		_spec := &sqlgraph.EdgeQuerySpec{
+			Edge: &sqlgraph.EdgeSpec{
+				Inverse: true,
+				Table:   server.EventTable,
+				Columns: server.EventPrimaryKey,
+			},
+			Predicate: func(s *sql.Selector) {
+				s.Where(sql.InValues(server.EventPrimaryKey[1], fks...))
+			},
+
+			ScanValues: func() [2]interface{} {
+				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
+			},
+			Assign: func(out, in interface{}) error {
+				eout, ok := out.(*sql.NullInt64)
+				if !ok || eout == nil {
+					return fmt.Errorf("unexpected id value for edge-out")
+				}
+				ein, ok := in.(*sql.NullInt64)
+				if !ok || ein == nil {
+					return fmt.Errorf("unexpected id value for edge-in")
+				}
+				outValue := int(eout.Int64)
+				inValue := int(ein.Int64)
+				node, ok := ids[outValue]
+				if !ok {
+					return fmt.Errorf("unexpected node id in edges: %v", outValue)
+				}
+				edgeids = append(edgeids, inValue)
+				edges[inValue] = append(edges[inValue], node)
+				return nil
+			},
+		}
+		if err := sqlgraph.QueryEdges(ctx, sq.driver, _spec); err != nil {
+			return nil, fmt.Errorf(`query edges "event": %v`, err)
+		}
+		query.Where(event.IDIn(edgeids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := edges[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected "event" node returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Event = append(nodes[i].Edges.Event, n)
 			}
 		}
 	}

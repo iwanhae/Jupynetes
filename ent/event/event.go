@@ -28,13 +28,11 @@ const (
 	// UserInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	UserInverseTable = "users"
-	// ServerTable is the table the holds the server relation/edge.
-	ServerTable = "servers"
+	// ServerTable is the table the holds the server relation/edge. The primary key declared below.
+	ServerTable = "event_server"
 	// ServerInverseTable is the table name for the Server entity.
 	// It exists in this package in order to avoid circular dependency with the "server" package.
 	ServerInverseTable = "servers"
-	// ServerColumn is the table column denoting the server relation/edge.
-	ServerColumn = "event_server"
 )
 
 // Columns holds all SQL columns for event fields.
@@ -48,6 +46,9 @@ var (
 	// UserPrimaryKey and UserColumn2 are the table columns denoting the
 	// primary key for the user relation (M2M).
 	UserPrimaryKey = []string{"event_id", "user_id"}
+	// ServerPrimaryKey and ServerColumn2 are the table columns denoting the
+	// primary key for the server relation (M2M).
+	ServerPrimaryKey = []string{"event_id", "server_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -61,8 +62,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultMessage holds the default value on creation for the message field.
-	DefaultMessage string
 	// DefaultCreatedAt holds the default value on creation for the created_at field.
 	DefaultCreatedAt func() time.Time
 )

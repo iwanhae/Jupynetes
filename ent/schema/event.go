@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/facebook/ent"
+	"github.com/facebook/ent/dialect"
 	"github.com/facebook/ent/schema/edge"
 	"github.com/facebook/ent/schema/field"
 )
@@ -16,7 +17,9 @@ type Event struct {
 // Fields of the Event.
 func (Event) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("message").Default(""),
+		field.String("message").SchemaType(map[string]string{
+			dialect.MySQL: "longtext",
+		}),
 		field.Time("created_at").Default(time.Now),
 	}
 }
